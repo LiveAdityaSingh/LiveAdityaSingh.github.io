@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Stars, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import './index.css';
 import Chatbot from './Chatbot';
@@ -137,144 +136,140 @@ const ROLES = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   PINNED 3D GLOBE + STARFIELD CANVAS
-   - Globe auto-rotates slowly
-   - Camera dollies back as user scrolls (scroll-linked)
-   - Starfield + atmosphere glow rendered on same canvas
+   3D ATOMIC PARTICLE SPHERE
+   - ~1200 particles distributed via fibonacci sphere
+   - Auto-rotates slowly
+   - Tilts opposite to mouse direction
 ═══════════════════════════════════════════════════════════ */
-function Earth() {
-  const scrollRef = useRef(0);
-  const earthRef = useRef();
-  const cloudsRef = useRef();
+const PARTICLE_COUNT = 1200;
+const SPHERE_RADIUS = 2.52;
 
-  const [colorMap, emissiveMap, bumpMap, cloudsMap] = useTexture([
-    'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-    'https://unpkg.com/three-globe/example/img/earth-night.jpg',
-    'https://unpkg.com/three-globe/example/img/earth-topology.png',
-    'https://unpkg.com/three-globe/example/img/earth-clouds1024.png'
-  ]);
+function ParticleSphere({ mouseRef }) {
+  const pointsRef = useRef();
+  const tiltRef = useRef({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const onScroll = () => {
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      scrollRef.current = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+  // Generate fibonacci-distributed points on a sphere
+  const { positions, sizes } = useMemo(() => {
+    const pos = new Float32Array(PARTICLE_COUNT * 3);
+    const sz = new Float32Array(PARTICLE_COUNT);
+    const goldenRatio = (1 + Math.sqrt(5)) / 2;
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      // Fibonacci sphere distribution
+      const theta = (2 * Math.PI * i) / goldenRatio;
+      const phi = Math.acos(1 - (2 * (i + 0.5)) / PARTICLE_COUNT);
+
+      // Add subtle variation to radius for organic feel
+      const r = SPHERE_RADIUS * (0.95 + Math.random() * 0.1);
+
+      pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      pos[i * 3 + 2] = r * Math.cos(phi);
+
+      // Random size variation
+      sz[i] = 1.2 + Math.random() * 2.0;
+    }
+
+    return { positions: pos, sizes: sz };
   }, []);
 
   useFrame((state, delta) => {
-    if (earthRef.current) {
-      earthRef.current.rotation.y += delta * 0.05;
-    }
-    if (cloudsRef.current) {
-      cloudsRef.current.rotation.y += delta * 0.07;
-    }
-    // Scroll-linked dolly
-    const CAM_NEAR = 2.5;
-    const CAM_FAR = 6.0;
-    const targetZ = CAM_NEAR + (CAM_FAR - CAM_NEAR) * scrollRef.current;
-    state.camera.position.z += (targetZ - state.camera.position.z) * 0.05;
+    if (!pointsRef.current) return;
+
+    // Auto-rotate slowly
+    pointsRef.current.rotation.y += delta * 0.06;
+
+    // Smooth tilt toward target (opposite of mouse direction)
+    const targetX = -mouseRef.current.y * 0.12; // ~7 degrees max
+    const targetY = -mouseRef.current.x * 0.12;
+    tiltRef.current.x += (targetX - tiltRef.current.x) * 0.03;
+    tiltRef.current.y += (targetY - tiltRef.current.y) * 0.03;
+
+    pointsRef.current.rotation.x = tiltRef.current.x;
+    pointsRef.current.rotation.z = tiltRef.current.y * 0.3;
+
+    // Gentle pulse via scale
+    const pulse = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.008;
+    pointsRef.current.scale.setScalar(pulse);
   });
 
+  // Custom shader material for glow particles
+  const shaderMaterial = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color('#f59e0b') },
+        uColorDim: { value: new THREE.Color('#d97706') },
+      },
+      vertexShader: `
+        attribute float aSize;
+        varying float vDist;
+        void main() {
+          vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = aSize * (200.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+          vDist = length(position) / ${SPHERE_RADIUS.toFixed(1)};
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        uniform vec3 uColorDim;
+        varying float vDist;
+        void main() {
+          // Circular point shape
+          float d = length(gl_PointCoord - vec2(0.5));
+          if (d > 0.5) discard;
+          // Soft glow falloff
+          float alpha = smoothstep(0.5, 0.0, d) * 0.75;
+          vec3 col = mix(uColorDim, uColor, 1.0 - d * 1.5);
+          gl_FragColor = vec4(col, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+  }, []);
+
   return (
-    <group position={[0, -0.2, 0]}>
-      <ambientLight intensity={0.1} />
-      <directionalLight position={[5, 3, 5]} intensity={1.5} />
-      
-      {/* Earth */}
-      <Sphere ref={earthRef} args={[1, 64, 64]}>
-        <meshStandardMaterial 
-          map={colorMap}
-          emissiveMap={emissiveMap}
-          emissive={new THREE.Color(0xffffff)}
-          emissiveIntensity={0.8}
-          bumpMap={bumpMap}
-          bumpScale={0.02}
+    <points ref={pointsRef} material={shaderMaterial}>
+      <bufferGeometry>
+        <bufferAttribute
+          attach="attributes-position"
+          count={PARTICLE_COUNT}
+          array={positions}
+          itemSize={3}
         />
-      </Sphere>
-
-      {/* Clouds */}
-      <Sphere ref={cloudsRef} args={[1.006, 64, 64]}>
-        <meshStandardMaterial 
-          map={cloudsMap}
-          transparent={true}
-          opacity={0.4}
-          blending={THREE.AdditiveBlending}
-          depthWrite={false}
+        <bufferAttribute
+          attach="attributes-aSize"
+          count={PARTICLE_COUNT}
+          array={sizes}
+          itemSize={1}
         />
-      </Sphere>
-
-      {/* Atmosphere Glow */}
-      <Sphere args={[1.04, 64, 64]}>
-        <meshBasicMaterial 
-          color="#3ecb7a" 
-          transparent={true} 
-          opacity={0.15} 
-          blending={THREE.AdditiveBlending}
-          side={THREE.BackSide}
-        />
-      </Sphere>
-    </group>
+      </bufferGeometry>
+    </points>
   );
 }
 
-function GlobeBackground() {
+function AtomicBackground() {
+  // Normalized mouse position: -1 to 1 (center = 0)
+  const mouseRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouseRef.current.y = (e.clientY / window.innerHeight) * 2 - 1;
+    };
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMouseMove);
+  }, []);
+
   return (
-    <div className="starfield-canvas" style={{ zIndex: 0, position: 'fixed', inset: 0, pointerEvents: 'none' }}>
-      <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }}>
-        <color attach="background" args={['#060507']} />
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-        <React.Suspense fallback={null}>
-          <Earth />
-        </React.Suspense>
+    <div className="particle-canvas" style={{ zIndex: 0, position: 'fixed', inset: 0, pointerEvents: 'none' }}>
+      <Canvas camera={{ position: [0, 0, 6.5], fov: 45 }}>
+        <color attach="background" args={['#0a0f1a']} />
+        <ParticleSphere mouseRef={mouseRef} />
       </Canvas>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════
-   3D GLASS SHARD BACKGROUND + DATA STREAMS
-═══════════════════════════════════════════════════════════ */
-const SHARDS = [
-  { type: 'hex',  w: 140, h: 140, top: '8%',  left: '6%',   rx: 15,  ry: -20, rz: 5,   dur: 22, del: 0,  op: 0.4 },
-  { type: 'hex',  w: 80,  h: 80,  top: '22%', right: '12%', rx: -12, ry: 18,  rz: -6,  dur: 28, del: 3,  op: 0.3 },
-  { type: 'hex',  w: 55,  h: 55,  top: '55%', left: '3%',   rx: 8,   ry: -10, rz: 12,  dur: 25, del: 5,  op: 0.25 },
-  { type: 'hex',  w: 100, h: 100, top: '75%', right: '8%',  rx: -18, ry: 12,  rz: -4,  dur: 30, del: 8,  op: 0.35 },
-  { type: 'hex',  w: 40,  h: 40,  top: '42%', left: '52%',  rx: 20,  ry: -5,  rz: 8,   dur: 18, del: 2,  op: 0.2 },
-  { type: 'pane', w: 170, h: 110, top: '14%', right: '4%',  rx: -8,  ry: 25,  rz: -3,  dur: 26, del: 4,  op: 0.25 },
-  { type: 'pane', w: 110, h: 70,  top: '65%', left: '13%',  rx: 12,  ry: -22, rz: 6,   dur: 24, del: 7,  op: 0.3  },
-  { type: 'pane', w: 90,  h: 60,  top: '35%', right: '26%', rx: -6,  ry: 14,  rz: -10, dur: 20, del: 1,  op: 0.2  },
-  { type: 'pane', w: 60,  h: 40,  top: '88%', left: '42%',  rx: 15,  ry: -8,  rz: 3,   dur: 22, del: 6,  op: 0.18 },
-  { type: 'hex',  w: 70,  h: 70,  top: '3%',  left: '38%',  rx: -10, ry: 20,  rz: -7,  dur: 32, del: 10, op: 0.22 },
-];
-
-function CyberBackground() {
-  return (
-    <div className="cyber-bg">
-      <div className="ambient-orb ambient-orb-1" />
-      <div className="ambient-orb ambient-orb-2" />
-      <div className="ambient-orb ambient-orb-3" />
-      {SHARDS.map((s, i) => (
-        <div
-          key={i}
-          className={`glass-shard ${s.type === 'hex' ? 'glass-shard-hex' : 'glass-shard-pane'}`}
-          style={{
-            width: s.w, height: s.h,
-            top: s.top, left: s.left, right: s.right, bottom: s.bottom,
-            '--rx': `${s.rx}deg`, '--ry': `${s.ry}deg`, '--rz': `${s.rz}deg`,
-            '--duration': `${s.dur}s`, '--delay': `${s.del}s`, '--op': s.op,
-          }}
-        >
-          <div className="glass-shard-inner" />
-        </div>
-      ))}
-      {/* Data streams */}
-      <div className="data-stream data-stream-1"><div className="data-stream-line" /></div>
-      <div className="data-stream data-stream-2"><div className="data-stream-line" /></div>
-      <div className="data-stream data-stream-3"><div className="data-stream-line" /></div>
-      <div className="data-stream data-stream-4"><div className="data-stream-vert" style={{ height: '100%' }} /></div>
-      <div className="data-stream data-stream-5"><div className="data-stream-vert" style={{ height: '100%' }} /></div>
     </div>
   );
 }
@@ -330,17 +325,12 @@ function Navbar() {
   );
 }
 
-/* ─── Hero with Holographic Bio Card ─────────────────────── */
+/* ─── Hero ─────────────────────────────────────────────── */
 function Hero() {
   return (
     <div className="hero" id="home">
-      <div className="hero-bg">
-        <div className="hero-blob hero-blob-1" />
-        <div className="hero-blob hero-blob-2" />
-        <div className="hero-blob hero-blob-3" />
-      </div>
       <div className="hero-grid">
-        {/* Holographic photo */}
+        {/* Photo */}
         <motion.div
           className="hero-photo-container"
           initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
@@ -436,7 +426,7 @@ function Hero() {
   );
 }
 
-/* ─── About (text-only, photo is in Hero now) ────────────── */
+/* ─── About ────────────────────────────────────────────── */
 function About() {
   return (
     <AnimSection id="about">
@@ -563,11 +553,8 @@ function Projects() {
   );
 }
 
-/* ─── Skills — Luminous Orb Cards ────────────────────────── */
+/* ─── Skills ─────────────────────────────────────────────── */
 function Skills() {
-  const orbDelays = [0, 1, 2, 0.5, 1.5, 2.5];
-  const orbDurations = [6, 7, 8, 6.5, 7.5, 5.5];
-
   return (
     <AnimSection id="skills">
       <SectionHeader label="// 04 · Skills" title="Technical Stack" />
@@ -578,18 +565,14 @@ function Skills() {
         whileInView="visible"
         viewport={{ once: true, margin: '-60px' }}
       >
-        {Object.entries(SKILLS).map(([group, items], i) => (
+        {Object.entries(SKILLS).map(([group, items]) => (
           <motion.div
             className="skill-orb"
             key={group}
             variants={fadeUp}
-            style={{
-              '--float-dur': `${orbDurations[i]}s`,
-              '--float-del': `${orbDelays[i]}s`,
-            }}
             whileHover={{
               scale: 1.03,
-              borderColor: 'rgba(0, 240, 255, 0.3)',
+              borderColor: 'rgba(245, 158, 11, 0.3)',
               transition: { duration: 0.3 },
             }}
           >
@@ -657,7 +640,7 @@ function Publications() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <motion.div
           className="pub-card"
-          whileHover={{ x: 4, boxShadow: '0 0 15px rgba(123,45,255,0.25), 0 0 45px rgba(123,45,255,0.08)' }}
+          whileHover={{ x: 4, boxShadow: '0 0 15px rgba(245,158,11,0.2), 0 0 45px rgba(245,158,11,0.06)' }}
           transition={{ duration: 0.3 }}
         >
           <p className="pub-title">"Self Workout Trainer — Skeletal Posture Analysis for Exercise Form Correction"</p>
@@ -736,7 +719,7 @@ function AspiredRoles() {
   );
 }
 
-/* ─── Contact — Neon Wireframe Form + Links ──────────────── */
+/* ─── Contact ────────────────────────────────────────────── */
 function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
@@ -876,8 +859,7 @@ function Footer() {
 export default function App() {
   return (
     <>
-      <GlobeBackground />
-      <CyberBackground />
+      <AtomicBackground />
       <Navbar />
       <main className="page">
         <Hero />
