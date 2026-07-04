@@ -45,8 +45,7 @@ Contact:
 - LinkedIn: aditya-singhofficial
 `;
 
-export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function Chatbot({ isOpen, setIsOpen }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: "Hi! I'm Aditya's AI assistant. Ask me anything about his experience, projects, or skills!" }
   ]);
@@ -129,7 +128,7 @@ export default function Chatbot() {
   };
 
   return (
-    <div className="chatbot-wrapper">
+    <div className={`chatbot-wrapper ${isOpen ? 'chatbot-wrapper--open' : ''}`}>
       {isOpen && (
         <div className="chatbot-window">
           <div className="chatbot-header">

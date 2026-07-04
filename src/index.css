@@ -113,7 +113,7 @@ img { display: block; max-width: 100%; }
   font-family: 'Inter', sans-serif;
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--accent);
   padding: 0.4rem 0.7rem;
   border-radius: var(--radius-pill);
   transition: all 0.25s;
@@ -168,7 +168,7 @@ img { display: block; max-width: 100%; }
   font-family: 'Inter', sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--accent);
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
   transition: all 0.2s;

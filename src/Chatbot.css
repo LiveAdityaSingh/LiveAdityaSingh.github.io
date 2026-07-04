@@ -12,6 +12,13 @@
   font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
+.chatbot-wrapper--open {
+  right: 50%;
+  bottom: 8vh;
+  transform: translateX(50%);
+  align-items: center;
+}
+
 /* ─── Toggle Button — Amber Orb ──────────────────────────── */
 .chatbot-toggle-btn {
   width: 58px;
@@ -42,16 +49,16 @@
 
 /* ─── Window — Glass Panel ──────────────────────────────── */
 .chatbot-window {
-  width: 380px;
+  width: 800px;
   max-width: calc(100vw - 4rem);
-  height: 500px;
+  height: 380px;
   max-height: calc(100vh - 8rem);
   background: rgba(15, 23, 42, 0.92);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(37, 99, 235, 0.3);
   border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.04);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 45px rgba(37, 99, 235, 0.25), 0 0 20px rgba(37, 99, 235, 0.15);
   display: flex;
   flex-direction: column;
   margin-bottom: 1rem;

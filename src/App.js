@@ -144,14 +144,13 @@ const ROLES = [
 const PARTICLE_COUNT = 1200;
 const SPHERE_RADIUS = 2.52;
 
-function ParticleSphere({ mouseRef }) {
+function ParticleSphere({ mouseRef, isChatbotOpen }) {
   const pointsRef = useRef();
   const tiltRef = useRef({ x: 0, y: 0 });
 
-  // Generate fibonacci-distributed points on a sphere
+  // Generate fibonacci-distributed points on a sphere and shuffle them
   const { positions, sizes } = useMemo(() => {
-    const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const sz = new Float32Array(PARTICLE_COUNT);
+    const points = [];
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -159,15 +158,31 @@ function ParticleSphere({ mouseRef }) {
       const theta = (2 * Math.PI * i) / goldenRatio;
       const phi = Math.acos(1 - (2 * (i + 0.5)) / PARTICLE_COUNT);
 
-      // Add subtle variation to radius for organic feel
-      const r = SPHERE_RADIUS * (0.95 + Math.random() * 0.1);
+      // Add very subtle variation to radius for an organic but cleaner boundary
+      const r = SPHERE_RADIUS * (0.985 + Math.random() * 0.03);
 
-      pos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pos[i * 3 + 2] = r * Math.cos(phi);
+      points.push({
+        x: r * Math.sin(phi) * Math.cos(theta),
+        y: r * Math.sin(phi) * Math.sin(theta),
+        z: r * Math.cos(phi),
+        size: 1.2 + Math.random() * 2.0
+      });
+    }
 
-      // Random size variation
-      sz[i] = 1.2 + Math.random() * 2.0;
+    // Shuffle points to ensure drawRange truncates randomly distributed particles
+    for (let i = points.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [points[i], points[j]] = [points[j], points[i]];
+    }
+
+    const pos = new Float32Array(PARTICLE_COUNT * 3);
+    const sz = new Float32Array(PARTICLE_COUNT);
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      pos[i * 3]     = points[i].x;
+      pos[i * 3 + 1] = points[i].y;
+      pos[i * 3 + 2] = points[i].z;
+      sz[i]          = points[i].size;
     }
 
     return { positions: pos, sizes: sz };
@@ -179,6 +194,15 @@ function ParticleSphere({ mouseRef }) {
     // Auto-rotate slowly
     pointsRef.current.rotation.y += delta * 0.06;
 
+    // Smoothly transition position Y (move to upper half, avoiding clipping)
+    const targetPosY = isChatbotOpen ? 1.2 : 0.0;
+    pointsRef.current.position.y += (targetPosY - pointsRef.current.position.y) * 0.05;
+
+    // Update point count (drawRange) immediately based on state
+    // "reduce 150%" interpreted as making it 2.5x smaller (1200 -> 480 points)
+    const targetCount = isChatbotOpen ? 480 : PARTICLE_COUNT;
+    pointsRef.current.geometry.setDrawRange(0, targetCount);
+
     // Smooth tilt toward target (opposite of mouse direction)
     const targetX = -mouseRef.current.y * 0.12; // ~7 degrees max
     const targetY = -mouseRef.current.x * 0.12;
@@ -188,9 +212,19 @@ function ParticleSphere({ mouseRef }) {
     pointsRef.current.rotation.x = tiltRef.current.x;
     pointsRef.current.rotation.z = tiltRef.current.y * 0.3;
 
+    // Smoothly transition base scale based on chatbot state
+    const targetScale = isChatbotOpen ? 0.5 : 1.0;
+    pointsRef.current.userData.currentScale = pointsRef.current.userData.currentScale || 1.0;
+    pointsRef.current.userData.currentScale += (targetScale - pointsRef.current.userData.currentScale) * 0.05;
+
     // Gentle pulse via scale
-    const pulse = 1 + Math.sin(state.clock.elapsedTime * 0.5) * 0.008;
+    const pulse = pointsRef.current.userData.currentScale + Math.sin(state.clock.elapsedTime * 0.5) * (0.008 * pointsRef.current.userData.currentScale);
     pointsRef.current.scale.setScalar(pulse);
+    
+    // Pass scale to shader so particles shrink proportionally
+    if (pointsRef.current.material && pointsRef.current.material.uniforms) {
+      pointsRef.current.material.uniforms.uScale.value = pointsRef.current.userData.currentScale;
+    }
   });
 
   // Custom shader material for glow particles
@@ -198,15 +232,17 @@ function ParticleSphere({ mouseRef }) {
     return new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
+        uScale: { value: 1.0 },
         uColor: { value: new THREE.Color('#f59e0b') },
         uColorDim: { value: new THREE.Color('#d97706') },
       },
       vertexShader: `
+        uniform float uScale;
         attribute float aSize;
         varying float vDist;
         void main() {
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = aSize * (200.0 / -mvPosition.z);
+          gl_PointSize = (aSize * uScale) * (200.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
           vDist = length(position) / ${SPHERE_RADIUS.toFixed(1)};
         }
@@ -251,7 +287,7 @@ function ParticleSphere({ mouseRef }) {
   );
 }
 
-function AtomicBackground() {
+function AtomicBackground({ isChatbotOpen }) {
   // Normalized mouse position: -1 to 1 (center = 0)
   const mouseRef = useRef({ x: 0, y: 0 });
 
@@ -268,7 +304,7 @@ function AtomicBackground() {
     <div className="particle-canvas" style={{ zIndex: 0, position: 'fixed', inset: 0, pointerEvents: 'none' }}>
       <Canvas camera={{ position: [0, 0, 6.5], fov: 45 }}>
         <color attach="background" args={['#0a0f1a']} />
-        <ParticleSphere mouseRef={mouseRef} />
+        <ParticleSphere mouseRef={mouseRef} isChatbotOpen={isChatbotOpen} />
       </Canvas>
     </div>
   );
@@ -381,7 +417,7 @@ function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.75 }}
           >
-            2+ years building production-grade AI and data solutions. Expert in architecting scalable
+            3 years building production-grade AI and data solutions. Expert in architecting scalable
             pipelines and agentic AI systems using Python and Google Cloud (Vertex AI, BigQuery, Dataproc).
             Currently pursuing <strong>MSc AI &amp; Machine Learning</strong> at the University of Birmingham.
           </motion.p>
@@ -405,7 +441,7 @@ function Hero() {
           transition={{ duration: 0.6, delay: 1.05 }}
         >
           <div>
-            <span className="hero-stat-num">2+</span>
+            <span className="hero-stat-num">3</span>
             <span className="hero-stat-label">Years Experience</span>
           </div>
           <div>
@@ -440,7 +476,7 @@ function About() {
       >
         <p>
           Hi, I'm <strong>Aditya Narayan Singh</strong> — a GCP Professional Data Engineer and
-          Azure AI Associate with 2+ years of experience building production-grade AI and data
+          Azure AI Associate with 3 years of experience building production-grade AI and data
           solutions at Accenture. Based in <strong>Birmingham, UK</strong>.
         </p>
         <p>
@@ -622,8 +658,8 @@ function Education() {
           <div className="timeline-body">
             <p>Foundation in software engineering, algorithms, databases, and data systems.</p>
             <ul>
-              <li>CGPA: <strong>7.29</strong></li>
-              <li>Key Modules: Data Structures, Algorithm Design, Database Management Systems, AOM, Data Analytics.</li>
+              <li>CGPA: <strong>7.58</strong></li>
+              <li>Key Modules: Data Structures, Algorithm Design, Database Management Systems, AI/ML, Data Analytics.</li>
               <li>Final Year Project: Self Workout Trainer — computer vision posture analysis system (published paper).</li>
             </ul>
           </div>
@@ -857,25 +893,34 @@ function Footer() {
    APP ROOT
 ═══════════════════════════════════════════════════════════ */
 export default function App() {
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
   return (
     <>
-      <AtomicBackground />
-      <Navbar />
-      <main className="page">
-        <Hero />
-        <About />
-        <Experience />
-        <Projects />
-        <Skills />
-        <Education />
-        <Publications />
-        <Certifications />
-        <CoCurricular />
-        <AspiredRoles />
-        <Contact />
-      </main>
-      <Footer />
-      <Chatbot />
+      <AtomicBackground isChatbotOpen={isChatbotOpen} />
+      <div style={{
+        opacity: isChatbotOpen ? 0 : 1,
+        pointerEvents: isChatbotOpen ? 'none' : 'auto',
+        transition: 'opacity 0.8s ease-in-out',
+        willChange: 'opacity'
+      }}>
+        <Navbar />
+        <main className="page">
+          <Hero />
+          <About />
+          <Experience />
+          <Projects />
+          <Skills />
+          <Education />
+          <Publications />
+          <Certifications />
+          <CoCurricular />
+          <AspiredRoles />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
+      <Chatbot isOpen={isChatbotOpen} setIsOpen={setIsChatbotOpen} />
     </>
   );
 }
