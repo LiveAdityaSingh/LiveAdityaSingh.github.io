@@ -1,0 +1,35 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.sqlite3
+*.sqlite
+*.db
+.venv/
+venv/
+env/
+# Build
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+# OS and editors
+.DS_Store
+Thumbs.db
+.vscode/
+*.code-workspace
+# Logs
+*.log
+# Docs and plans
+*.md
+docs/
+AGENTS.md
+MLTVA_Technical_Build_Spec.md
+# Binary installers
+*.exe
+# Data raw files
+data/raw/
+# Jupyter
+.ipynb_checkpoints/

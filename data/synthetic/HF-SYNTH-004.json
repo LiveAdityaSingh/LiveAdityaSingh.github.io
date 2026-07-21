@@ -1,0 +1,21 @@
+{
+  "case_id": "HF-SYNTH-004",
+  "age": 50,
+  "sex": "Unknown",
+  "chief_complaint": "Review clinical notes for chief complaint",
+  "symptoms": [
+    "Refer to notes"
+  ],
+  "observations": [
+    {
+      "code": "N/A",
+      "display": "Placeholder Observation",
+      "value": "0",
+      "unit": null,
+      "effective_time": null
+    }
+  ],
+  "notes": [
+    "{'clinical_notes': 'Admission Date: [2845-8-24] \\nDate of Birth: [2795-3-24] \\nService: GASTROENTEROLOGY\\n\\nChief Complaint: Abdominal pain, nausea, and vomiting\\nMajor Surgical or Invasive Procedure: Laparoscopic cholecystectomy\\nHistory of Present Illness: A 45-year-old female admitted with complaints of persistent abdominal pain, nausea, and vomiting for the past one week. The patient has a history of intermittent abdominal pain and has recently experienced worsening symptoms.\\n\\n\\nAllergies: NKDA\\n\\nPast Medical History: Hypertension\\nSocial History: Non-smoker, occasional alcohol consumption, homemaker, married with two children\\n\\nFamily History: Mother with history of breast cancer\\n\\nPhysical Exam:\\nGeneral: Well-developed, well-nourished female in mild discomfort.\\nVital signs: BP 120/80 mmHg, HR 75bpm, RR 16 breaths/minute, Temperature 98.6°F, SpO2 98% on room air\\nCardiovascular: No murmurs, rubs, or gallops\\nRespiratory: Clear to auscultation bilaterally\\nAbdomen: Soft, non-tender, non-distended. Palpable gallstones in the right upper quadrant\\nExtremities: No edema, pulses intact\\n\\nPertinent Results:\\n\\nECG: Sinus rhythm, no acute ST-T changes\\nLaboratory Results:\\n\\n* White blood cell count: 12,000 /mm3\\n* Aspartate aminotransferase (AST): 50 IU/L\\n* Alanine aminotransferase (ALT): 30 IU/L\\n* Alkaline phosphatase (ALP): 150 IU/L\\n* Bilirubin (total): 0.8mg/dL\\n* Creatinine: 0.8mg/dL\\n* Lipase: 120 IU/L\\n* Amylase: 50 IU/L\\n\\nBrief Hospital Course:\\nThe patient was admitted for laparoscopic cholecystectomy due to the presence of symptomatic gallstones. The procedure was performed successfully, and the patient had an uneventful postoperative course. The patient was discharged with appropriate medications for pain management and to prevent further complications.\\n\\nMedications on Admission:\\n\\nAcetaminophen 325 mg PO TID\\n Ondansetron 8 mg IV\\nDischarge Medications:\\n\\nAcetaminophen 325 mg PO TID\\nOndansetron 8 mg PO BID\\n\\nDischarge Diagnosis: Cholecystitis, Gallbladder stone\\n\\nDischarge Condition: Stable\\n\\nDischarge Instructions:\\n\\n* Follow-up with gastroenterologist in 2 weeks\\n* Continue medications as prescribed\\n* Monitor abdominal pain and report any new symptoms\\n* Follow-up Instructions: Follow up with gastroenterologist in 2 weeks.', 'summary': \"Based on the clinical notes provided, the patient is a 45-year-old female who was admitted to the hospital with abdominal pain, nausea, and vomiting. The patient has a history of intermittent abdominal pain and recent worsening symptoms. The patient's vital signs were normal, except for tender abdomen. The patient underwent a laparoscopic cholecystectomy due to the presence of symptomatic gallstones. The patient had an uneventful postoperative course and was discharged with appropriate medications for pain management and to prevent further complications. The patient's discharge diagnosis is cholecystitis, gallbladder stone, and the patient's condition is stable. The patient was instructed to follow up with the gastroenterologist in two weeks and to monitor any new symptoms. \"}"
+  ]
+}

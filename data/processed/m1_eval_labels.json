@@ -1,0 +1,92 @@
+[
+  {
+    "_comment": "CASE-001: Acute MI — all claims grounded",
+    "case_id": "CASE-001",
+    "claims": [
+      {"text": "Patient presents with elevated troponin T at 0.85 ng/mL, indicating myocardial injury", "supporting_evidence_ref": "6598-7", "expected_grounded": true},
+      {"text": "Elevated CK-MB at 45 ng/mL supports acute myocardial infarction", "supporting_evidence_ref": "2157-6", "expected_grounded": true},
+      {"text": "Tachycardia with heart rate of 110 bpm is consistent with hemodynamic compromise", "supporting_evidence_ref": "8867-4", "expected_grounded": true},
+      {"text": "Patient has a 30-year smoking history which is a major cardiovascular risk factor", "supporting_evidence_ref": "30-year smoking history", "expected_grounded": true},
+      {"text": "Total cholesterol of 280 mg/dL indicates hyperlipidemia", "supporting_evidence_ref": "2093-3", "expected_grounded": true}
+    ]
+  },
+  {
+    "_comment": "CASE-001: Deliberately fabricated claims — should be ungrounded",
+    "case_id": "CASE-001",
+    "claims": [
+      {"text": "D-dimer is elevated at 2.5 mg/L suggesting pulmonary embolism", "supporting_evidence_ref": "48065-7", "expected_grounded": false},
+      {"text": "Patient has diabetes with HbA1c of 9.2%", "supporting_evidence_ref": "4548-4", "expected_grounded": false},
+      {"text": "ECG shows ST elevation in leads V1-V4", "supporting_evidence_ref": "ECG findings", "expected_grounded": false}
+    ]
+  },
+  {
+    "_comment": "CASE-002: Migraine — mixed grounded/ungrounded",
+    "case_id": "CASE-002",
+    "claims": [
+      {"text": "Patient has history of migraine with aura since age 20", "supporting_evidence_ref": "history of migraine with aura since age 20", "expected_grounded": true},
+      {"text": "WBC count is 7.5 indicating no significant infection", "supporting_evidence_ref": "26464-8", "expected_grounded": true},
+      {"text": "CSF analysis shows elevated protein suggesting meningitis", "supporting_evidence_ref": "2880-3", "expected_grounded": false},
+      {"text": "Neurological exam shows no focal deficits", "supporting_evidence_ref": "Neurological exam shows no focal deficits", "expected_grounded": true}
+    ]
+  },
+  {
+    "_comment": "CASE-003: Heart failure — grounded claims",
+    "case_id": "CASE-003",
+    "claims": [
+      {"text": "BNP of 1250 pg/mL is significantly elevated, consistent with acute heart failure", "supporting_evidence_ref": "42637-9", "expected_grounded": true},
+      {"text": "Hyponatremia with sodium of 131 mEq/L suggests dilutional effect from fluid overload", "supporting_evidence_ref": "2951-2", "expected_grounded": true},
+      {"text": "SpO2 of 91% indicates hypoxemia requiring supplemental oxygen", "supporting_evidence_ref": "59408-5", "expected_grounded": true},
+      {"text": "Known ischemic cardiomyopathy with EF 30%", "supporting_evidence_ref": "ischemic cardiomyopathy with EF 30%", "expected_grounded": true}
+    ]
+  },
+  {
+    "_comment": "CASE-003: Fabricated claims for heart failure case",
+    "case_id": "CASE-003",
+    "claims": [
+      {"text": "Chest X-ray shows bilateral pleural effusions", "supporting_evidence_ref": "chest X-ray", "expected_grounded": false},
+      {"text": "Potassium is critically low at 2.8 mEq/L", "supporting_evidence_ref": "2823-3", "expected_grounded": false}
+    ]
+  },
+  {
+    "_comment": "CASE-004: Appendicitis — grounded claims",
+    "case_id": "CASE-004",
+    "claims": [
+      {"text": "Elevated WBC count at 14.5 suggests acute inflammatory process", "supporting_evidence_ref": "26464-8", "expected_grounded": true},
+      {"text": "CRP of 85 mg/L indicates significant systemic inflammation", "supporting_evidence_ref": "49765-1", "expected_grounded": true},
+      {"text": "CT abdomen shows inflamed appendix with periappendicular fat stranding", "supporting_evidence_ref": "CT abdomen shows inflamed appendix", "expected_grounded": true},
+      {"text": "Fever of 38.3°C supports infectious or inflammatory etiology", "supporting_evidence_ref": "8310-5", "expected_grounded": true}
+    ]
+  },
+  {
+    "_comment": "CASE-004: Fabricated claims for appendicitis",
+    "case_id": "CASE-004",
+    "claims": [
+      {"text": "Lipase is elevated at 450 U/L suggesting pancreatitis", "supporting_evidence_ref": "1798-8", "expected_grounded": false},
+      {"text": "Urinalysis shows pyuria indicating urinary tract infection", "supporting_evidence_ref": "5799-2", "expected_grounded": false}
+    ]
+  },
+  {
+    "_comment": "CASE-005: ACL tear — grounded claims",
+    "case_id": "CASE-005",
+    "claims": [
+      {"text": "MRI confirms complete ACL tear with associated medial meniscus tear", "supporting_evidence_ref": "complete ACL tear with associated medial meniscus tear", "expected_grounded": true},
+      {"text": "Positive Lachman test indicates anterior cruciate ligament instability", "supporting_evidence_ref": "Positive Lachman test", "expected_grounded": true},
+      {"text": "CRP of 12 mg/L shows mild inflammatory response consistent with acute injury", "supporting_evidence_ref": "49765-1", "expected_grounded": true}
+    ]
+  },
+  {
+    "_comment": "CASE-005: Fabricated claim for ortho case",
+    "case_id": "CASE-005",
+    "claims": [
+      {"text": "X-ray reveals tibial plateau fracture requiring surgical fixation", "supporting_evidence_ref": "X-ray findings", "expected_grounded": false},
+      {"text": "", "supporting_evidence_ref": null, "expected_grounded": false}
+    ]
+  },
+  {
+    "_comment": "Edge case: claim with no reference at all",
+    "case_id": "CASE-001",
+    "claims": [
+      {"text": "Patient should be started on aspirin and heparin immediately", "supporting_evidence_ref": null, "expected_grounded": false}
+    ]
+  }
+]
