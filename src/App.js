@@ -54,24 +54,24 @@ function SectionHeader({ label, title }) {
 ═══════════════════════════════════════════════════════════ */
 
 const NAV_LINKS = [
-  { href: '#about',         label: 'About'       },
-  { href: '#experience',    label: 'Experience'  },
-  { href: '#projects',      label: 'Projects'    },
-  { href: '#skills',        label: 'Skills'      },
-  { href: '#education',     label: 'Education'   },
-  { href: '#publications',  label: 'Research'    },
-  { href: '#certifications',label: 'Certs'       },
-  { href: '#roles',         label: 'Roles'       },
-  { href: '#contact',       label: 'Contact'     },
+  { href: '#about', label: 'About' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#skills', label: 'Skills' },
+  { href: '#education', label: 'Education' },
+  { href: '#publications', label: 'Research' },
+  { href: '#certifications', label: 'Certs' },
+  { href: '#roles', label: 'Roles' },
+  { href: '#contact', label: 'Contact' },
 ];
 
 const SKILLS = {
-  'AI / GenAI':    ['Multi-Agent Systems (ADK)', 'RAG', 'LLMs', 'NLP', 'Computer Vision', 'Prompt Engineering'],
-  'ML / DL':       ['TensorFlow', 'PyTorch', 'Scikit-Learn', 'Keras', 'XGBoost', 'OpenCV'],
-  'Data Eng.':     ['PySpark', 'Apache NiFi', 'dbt', 'Apache Kafka', 'Hadoop', 'Airflow', 'Informatica'],
-  'Cloud':         ['GCP (Vertex AI, BigQuery, Dataproc)', 'Azure', 'AWS', 'Docker', 'Kubernetes', 'GitLab CI'],
-  'Languages':     ['Python', 'SQL', 'JavaScript', 'R', 'Bash'],
-  'Viz & BI':      ['Tableau', 'Power BI', 'Matplotlib', 'Seaborn'],
+  'AI / GenAI': ['Multi-Agent Systems (ADK)', 'RAG', 'LLMs', 'NLP', 'Computer Vision', 'Prompt Engineering'],
+  'ML / DL': ['TensorFlow', 'PyTorch', 'Scikit-Learn', 'Keras', 'XGBoost', 'OpenCV'],
+  'Data Eng.': ['PySpark', 'Apache NiFi', 'dbt', 'Apache Kafka', 'Hadoop', 'Airflow', 'Informatica'],
+  'Cloud': ['GCP (Vertex AI, BigQuery, Dataproc)', 'Azure', 'AWS', 'Docker', 'Kubernetes', 'GitLab CI'],
+  'Languages': ['Python', 'SQL', 'JavaScript', 'R', 'Bash'],
+  'Viz & BI': ['Tableau', 'Power BI', 'Matplotlib', 'Seaborn'],
 };
 
 const PROJECTS = [
@@ -121,18 +121,18 @@ const PROJECTS = [
 ];
 
 const CERTS = [
-  { icon: '☁️',  name: 'Microsoft Certified: Azure AI Engineer Associate',  org: 'Microsoft',          year: 'Dec 2021' },
-  { icon: '🔷',  name: 'Google Cloud Professional Data Engineer',           org: 'Google Cloud',       year: 'Oct 2024' },
-  { icon: '🎓',  name: 'Artificial Intelligence Certification',              org: 'ERACT Academy, IIT Kanpur', year: 'Jul 2022' },
-  { icon: '🤖',  name: 'Neural Networks and Deep Learning',                  org: 'DeepLearning.AI',    year: 'Aug 2021' },
-  { icon: '👁️',  name: 'Computer Vision Basics',                             org: 'University at Buffalo', year: 'Jan 2021' },
+  { icon: '☁️', name: 'Microsoft Certified: Azure AI Engineer Associate', org: 'Microsoft', year: 'Dec 2021' },
+  { icon: '🔷', name: 'Google Cloud Professional Data Engineer', org: 'Google Cloud', year: 'Oct 2024' },
+  { icon: '🎓', name: 'Artificial Intelligence Certification', org: 'ERACT Academy, IIT Kanpur', year: 'Jul 2022' },
+  { icon: '🤖', name: 'Neural Networks and Deep Learning', org: 'DeepLearning.AI', year: 'Aug 2021' },
+  { icon: '👁️', name: 'Computer Vision Basics', org: 'University at Buffalo', year: 'Jan 2021' },
 ];
 
 const ROLES = [
-  { icon: '⚙️', title: 'MLOps Engineer',        desc: 'Deploying & monitoring ML models at production scale', rank: '1st' },
-  { icon: '🤖', title: 'AI / ML Engineer',       desc: 'Building and shipping production AI/ML systems',       rank: '2nd' },
-  { icon: '📊', title: 'Data Scientist',          desc: 'Turning raw data into actionable insights',            rank: '3rd' },
-  { icon: '📡', title: 'Data Engineer',           desc: 'Scalable pipelines & cloud data infrastructure',       rank: '4th' },
+  { icon: '⚙️', title: 'MLOps Engineer', desc: 'Deploying & monitoring ML models at production scale', rank: '1st' },
+  { icon: '🤖', title: 'AI / ML Engineer', desc: 'Building and shipping production AI/ML systems', rank: '2nd' },
+  { icon: '📊', title: 'Data Scientist', desc: 'Turning raw data into actionable insights', rank: '3rd' },
+  { icon: '📡', title: 'Data Engineer', desc: 'Scalable pipelines & cloud data infrastructure', rank: '4th' },
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -179,10 +179,10 @@ function ParticleSphere({ mouseRef, isChatbotOpen }) {
     const sz = new Float32Array(PARTICLE_COUNT);
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      pos[i * 3]     = points[i].x;
+      pos[i * 3] = points[i].x;
       pos[i * 3 + 1] = points[i].y;
       pos[i * 3 + 2] = points[i].z;
-      sz[i]          = points[i].size;
+      sz[i] = points[i].size;
     }
 
     return { positions: pos, sizes: sz };
@@ -220,7 +220,7 @@ function ParticleSphere({ mouseRef, isChatbotOpen }) {
     // Gentle pulse via scale
     const pulse = pointsRef.current.userData.currentScale + Math.sin(state.clock.elapsedTime * 0.5) * (0.008 * pointsRef.current.userData.currentScale);
     pointsRef.current.scale.setScalar(pulse);
-    
+
     // Pass scale to shader so particles shrink proportionally
     if (pointsRef.current.material && pointsRef.current.material.uniforms) {
       pointsRef.current.material.uniforms.uScale.value = pointsRef.current.userData.currentScale;
@@ -466,7 +466,7 @@ function Hero() {
 function About() {
   return (
     <AnimSection id="about">
-      <SectionHeader label="// 01 · About" title="Who I Am" />
+      <SectionHeader label="// 01 · About" title="Who am I ???" />
       <motion.div
         className="about-panel"
         initial={{ opacity: 0, y: 20 }}
@@ -475,19 +475,13 @@ function About() {
         transition={{ duration: 0.6 }}
       >
         <p>
-          Hi, I'm <strong>Aditya Narayan Singh</strong> — a GCP Professional Data Engineer and
-          Azure AI Associate with 3 years of experience building production-grade AI and data
-          solutions at Accenture. Based in <strong>Birmingham, UK</strong>.
+          Hi, I'm <strong>Aditya Narayan Singh</strong>, a GCP Professional Data Engineer and Azure AI Associate with 3 years experience building production-grade AI and data solutions at Accenture. Based in <strong>Birmingham, UK</strong>.
         </p>
         <p>
-          I am an expert in architecting scalable pipelines and agentic AI systems using Python
-          and Google Cloud (Vertex AI, BigQuery, Dataproc). My proven track record includes
-          reducing system latency by 40% and deploying enterprise-grade RAG and multi-agent frameworks.
+          I have extensive experience in designing scalable pipelines and agentic AI systems in Python and Google Cloud (Vertex AI, BigQuery, Dataproc). I have successfully cut down the system latency by 40% and successfully introduced enterprise-level RAG and multi-agent frameworks.
         </p>
         <p>
-          Currently pursuing my <strong>MSc in Artificial Intelligence &amp; Machine Learning</strong> at the
-          University of Birmingham, with research interests at the intersection of evolutionary
-          computation, deep learning, and computer vision.
+          Studying <strong>MSc Artificial Intelligence &amp; Machine Learning</strong> from the University of Birmingham, research interests in computer vision, deep learning and evolutionary computation.
         </p>
         <div className="about-highlights">
           {[
@@ -495,7 +489,7 @@ function About() {
             '🎓 MSc Artificial Intelligence & Machine Learning — University of Birmingham (2025–2026)',
             '💼 Ex-Data Engineering Analyst @ Accenture (Oct 2022 – Aug 2025)',
             '🏆 HealthTech AI 2026 Winner · FrontierTechAI Loyalty Program Winner',
-            '🥁 Drummer, volunteer dog rescuer & multilingual (English, Hindi, Punjabi, German)',
+            '🥁 Drummer, volunteer dog carer & Badminton Enthusiast',
           ].map(h => (
             <motion.div
               className="about-highlight"
@@ -530,10 +524,9 @@ function Experience() {
             <span className="timeline-period">Oct 2022 – Aug 2025</span>
           </div>
           <div className="timeline-body">
-            <p>Architected and delivered end-to-end predictive data pipelines for high-value enterprise clients using GCP and Apache NiFi.</p>
             <ul>
-              <li>Architected and deployed end-to-end predictive pipelines using <strong>NiFi and GCP</strong>, reducing architecture latency by <strong>40%</strong> and accelerating data-driven decision-making.</li>
-              <li>Engineered and optimised ETL architecture for <strong>300M+ records</strong>, cutting data-to-model latency by <strong>30%</strong> to enable real-time predictive analytics.</li>
+              <li>Architected and deployed end-to-end predictive pipelines using NiFi and GCP, reducing architecture latency by 40% and accelerating data-driven decision-making.</li>
+              <li>Engineered and optimised ETL architecture for 300M+ records, cutting data-to-model latency by 30% to enable real-time predictive analytics.</li>
               <li>Led technical discovery and requirement gathering for strategic code improvements, ensuring AI solutions met rigorous business and infrastructure requirements.</li>
               <li>Delivered high-impact presentations translating complex ML enhancements and algorithm optimisations into measurable ROI for business stakeholders.</li>
               <li>Completed professional certifications in Tableau, Informatica, PowerBI, DataProc, PySpark, and Communication.</li>
@@ -553,8 +546,8 @@ function Experience() {
           <div className="timeline-body">
             <p>Developed predictive analytics solutions for enterprise risk assessment.</p>
             <ul>
-              <li>Built predictive analytics solutions using Python, Pandas, and NumPy, achieving <strong>90% forecasting accuracy</strong> for strategic risk assessment.</li>
-              <li>Optimised ensembles of classification/regression models ensuring production-ready performance across diverse enterprise datasets.</li>
+              <li>Developed predictive analytics solutions using Python, Pandas and NumPy while achieved 90% forecasting accuracy to support strategic risk assessment.  </li>
+              <li>Optimized ensemble of classification/regression models, ensure production-ready performance across diverse enterprise datasets.  </li>
             </ul>
           </div>
         </motion.div>
@@ -640,8 +633,8 @@ function Education() {
           <div className="timeline-body">
             <p>Postgraduate programme in AI/ML with a focus on deep learning, computer vision, and evolutionary computation.</p>
             <ul>
-              <li>Key Modules: Mathematics for AI, Machine Learning, Artificial Intelligence, Computer Vision &amp; Imagery, NLP.</li>
-              <li>Research interest: Optimization of Evolutionary Computation techniques for deep learning models.</li>
+              <li>Key Modules: Mathematics for AI, rtificial Intelligence, Computer Vision &amp; Images, NLP.</li>
+              <li>Research interest: Multi-modal multi-agent architecture for clinical report generation</li>
             </ul>
           </div>
         </motion.div>
@@ -826,7 +819,7 @@ function Contact() {
           <motion.a href="https://github.com/liveadityasingh" target="_blank" rel="noopener noreferrer" className="contact-card" id="contact-github" variants={fadeUp} whileHover={cardHover}>
             <div className="contact-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"/>
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z" />
               </svg>
             </div>
             <div>
@@ -838,7 +831,7 @@ function Contact() {
           <motion.a href="https://www.linkedin.com/in/aditya-singhofficial/" target="_blank" rel="noopener noreferrer" className="contact-card" id="contact-linkedin" variants={fadeUp} whileHover={cardHover}>
             <div className="contact-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
               </svg>
             </div>
             <div>
@@ -850,8 +843,8 @@ function Contact() {
           <motion.a href="mailto:adityasingh2897@gmail.com" className="contact-card" id="contact-email" variants={fadeUp} whileHover={cardHover}>
             <div className="contact-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
               </svg>
             </div>
             <div>
@@ -863,7 +856,7 @@ function Contact() {
           <motion.a href="tel:+447357674282" className="contact-card" id="contact-phone" variants={fadeUp} whileHover={cardHover}>
             <div className="contact-icon">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
             </div>
             <div>
