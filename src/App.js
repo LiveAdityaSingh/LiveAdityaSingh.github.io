@@ -634,7 +634,7 @@ function Education() {
             <p>Postgraduate programme in AI/ML with a focus on deep learning, computer vision, and evolutionary computation.</p>
             <ul>
               <li>Key Modules: Mathematics for AI, rtificial Intelligence, Computer Vision &amp; Images, NLP.</li>
-              <li>Research interest: Multi-modal multi-agent architecture for clinical report generation</li>
+              <li>Research interest: Multi-modal multi-agent architecture for clinical report generation with credibility score for trustworthy AI</li>
             </ul>
           </div>
         </motion.div>
