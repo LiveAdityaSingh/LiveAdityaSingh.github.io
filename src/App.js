@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import './index.css';
@@ -363,23 +363,51 @@ function Navbar() {
 
 /* ─── Hero ─────────────────────────────────────────────── */
 function Hero() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set(e.clientX - centerX);
+    y.set(e.clientY - centerY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const rotateX = useTransform(y, [-100, 100], [6, -6]);
+  const rotateY = useTransform(x, [-100, 100], [-6, 6]);
+
   return (
     <div className="hero" id="home">
       <div className="hero-grid">
         {/* Photo */}
-        <motion.div
+        <div
           className="hero-photo-container"
-          initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
-          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-          transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          style={{ perspective: 3000 }}
         >
-          <div className="hero-photo-hex">
-            <img
-              src="https://avatars.githubusercontent.com/liveadityasingh"
+          <motion.div
+            className="hero-photo-hex"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
+          >
+            <motion.img
+              src={process.env.PUBLIC_URL + '/avatar_transparent.png'}
               alt="Aditya Narayan Singh"
+              style={{ rotateX, rotateY, x: "-50%", zIndex: 10, transformOrigin: 'bottom center' }}
+              initial={{ rotateX: 20, y: 50, opacity: 0 }}
+              animate={{ rotateX: 0, y: 0, opacity: 1 }}
+              transition={{ duration: 1.5, delay: 0.6, type: 'spring', bounce: 0.15 }}
             />
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
 
         {/* Bio content */}
         <div className="hero-content">
