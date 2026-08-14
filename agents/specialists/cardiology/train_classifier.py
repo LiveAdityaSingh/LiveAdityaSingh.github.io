@@ -1,15 +1,22 @@
-"""Train the ResNet1D ECG classifier on PTB-XL.
+"""Train the ResNet1D ECG classifier.
 
 Standalone training script that:
-  1. Loads PTB-XL data (HuggingFace or synthetic fallback)
+  1. Loads ECG data (MIMIC-IV-ECG primary, PTB-XL fallback, or synthetic)
   2. Trains a ResNet1D on 5 diagnostic superclasses
-  3. Evaluates on test fold (AUROC, per-class accuracy)
+  3. Evaluates on test set (AUROC, per-class accuracy)
   4. Saves the best model checkpoint
 
 Usage:
     python -m agents.specialists.cardiology.train_classifier
-    python -m agents.specialists.cardiology.train_classifier --synthetic
-    python -m agents.specialists.cardiology.train_classifier --epochs 50
+    python -m agents.specialists.cardiology.train_classifier --source mimic
+    python -m agents.specialists.cardiology.train_classifier --source ptbxl
+    python -m agents.specialists.cardiology.train_classifier --source synthetic
+    python -m agents.specialists.cardiology.train_classifier --epochs 50 --device cuda
+
+Data sources:
+  - mimic (default): MIMIC-IV-ECG waveforms with ICD-derived labels
+  - ptbxl: PTB-XL via HuggingFace (fallback, pre-labeled superclasses)
+  - synthetic: Generated waveforms for dev/testing without real data
 
 This script has NO dependency on M3+ and trains the classifier in isolation.
 """
@@ -32,8 +39,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent.parent))
 from data.ptbxl_loader import (
     load_ptbxl_from_huggingface,
     generate_synthetic_ecg_data,
-    get_train_val_test_split,
+    get_train_val_test_split as ptbxl_split,
     SUPERCLASSES,
+)
+from data.mimic_ecg_loader import (
+    load_mimic_ecg_dataset,
+    get_train_val_test_split as mimic_split,
 )
 from agents.specialists.cardiology.ecg_classifier import ResNet1D, NUM_CLASSES
 
@@ -148,24 +159,44 @@ def evaluate(
 
 def main():
     parser = argparse.ArgumentParser(description="Train ECG ResNet1D classifier")
-    parser.add_argument("--synthetic", action="store_true", help="Use synthetic data only")
+    parser.add_argument(
+        "--source",
+        choices=["mimic", "ptbxl", "synthetic"],
+        default="mimic",
+        help="Data source: mimic (default), ptbxl (fallback), synthetic (dev)",
+    )
+    parser.add_argument("--synthetic", action="store_true", help="Shorthand for --source synthetic")
+    parser.add_argument("--max-records", type=int, default=500, help="Max ECG records for MIMIC")
     parser.add_argument("--epochs", type=int, default=DEFAULT_EPOCHS)
     parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE)
     parser.add_argument("--lr", type=float, default=DEFAULT_LR)
-    parser.add_argument("--device", type=str, default="cpu")
+    parser.add_argument(
+        "--device", type=str,
+        default="cuda" if torch.cuda.is_available() else "cpu",
+        help="Device for training (auto-detects GPU)",
+    )
     args = parser.parse_args()
 
+    # Handle --synthetic shorthand
+    source = "synthetic" if args.synthetic else args.source
+
     device = torch.device(args.device)
-    logger.info("Training on device: %s", device)
+    logger.info("Training on device: %s (source: %s)", device, source)
 
     # ── Load Data ────────────────────────────────────────────────────────
-    if args.synthetic:
-        logger.info("Using synthetic ECG data (--synthetic flag)")
-        X, y, folds = generate_synthetic_ecg_data(num_samples=500)
-    else:
+    if source == "mimic":
+        logger.info("Loading MIMIC-IV-ECG data (max_records=%d)", args.max_records)
+        X, y, _sids = load_mimic_ecg_dataset(max_records=args.max_records)
+        splits = mimic_split(X, y)
+    elif source == "ptbxl":
+        logger.info("Loading PTB-XL data (fallback)")
         X, y, folds = load_ptbxl_from_huggingface()
+        splits = ptbxl_split(X, y, folds)
+    else:  # synthetic
+        logger.info("Using synthetic ECG data")
+        X, y, folds = generate_synthetic_ecg_data(num_samples=500)
+        splits = ptbxl_split(X, y, folds)
 
-    splits = get_train_val_test_split(X, y, folds)
     X_train, y_train = splits["train"]
     X_val, y_val = splits["val"]
     X_test, y_test = splits["test"]

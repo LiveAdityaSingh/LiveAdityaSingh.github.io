@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
-DEFAULT_MODEL = "openbiollm"
+DEFAULT_MODEL = "koesn/llama3-openbiollm-8b"
 MAX_SCHEMA_RETRIES = 2  # retries on malformed JSON, not grounding retries
 
 SYSTEM_PROMPT = """\

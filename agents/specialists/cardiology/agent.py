@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
-DEFAULT_MODEL = "openbiollm"
+DEFAULT_MODEL = "koesn/llama3-openbiollm-8b"
 MAX_SCHEMA_RETRIES = 2
 
 # ICD-10 codes for PTB-XL diagnostic superclasses
@@ -57,7 +57,9 @@ SUPERCLASS_ICD10_MAP: dict[str, list[str]] = {
     "HYP":  ["I51.7"],                # Cardiomegaly / hypertrophy
 }
 
-# Confidence weighting: CNN is more calibratable than LLM self-assessment
+# PROVISIONAL: These blend weights have not been empirically calibrated.
+# Ideally, fit them on a held-out PTB-XL/MIMIC-ECG validation set by
+# finding the blend that maximises correlation with ground-truth labels.
 CNN_CONFIDENCE_WEIGHT = 0.7
 LLM_CONFIDENCE_WEIGHT = 0.3
 

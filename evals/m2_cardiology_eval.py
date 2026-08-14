@@ -32,7 +32,7 @@ def eval_dsp_pipeline() -> dict:
         extract_multilead_features,
     )
 
-    print("\n── DSP Feature Extraction Evaluation ──")
+    print("\n-- DSP Feature Extraction Evaluation --")
 
     results = {"passed": 0, "failed": 0, "tests": []}
 
@@ -88,25 +88,53 @@ def eval_dsp_pipeline() -> dict:
     return results
 
 
-def eval_cnn_classifier(use_synthetic: bool = True) -> dict:
-    """Evaluate the CNN classifier on test data."""
+def eval_cnn_classifier(source: str = "mimic") -> dict:
+    """Evaluate the CNN classifier on test data.
+
+    Args:
+        source: Data source - 'mimic', 'ptbxl', or 'synthetic'.
+    """
     from agents.specialists.cardiology.ecg_classifier import ECGClassifier
-    from data.ptbxl_loader import (
-        generate_synthetic_ecg_data,
-        get_train_val_test_split,
-        SUPERCLASSES,
-    )
 
-    print("\n── CNN Classifier Evaluation ──")
+    print(f"\n-- CNN Classifier Evaluation (source: {source}) --")
 
-    # Load data
-    if use_synthetic:
-        X, y, folds = generate_synthetic_ecg_data(num_samples=100)
-    else:
-        from data.ptbxl_loader import load_ptbxl_from_huggingface
+    # Load data based on source
+    if source == "mimic":
+        try:
+            from data.mimic_ecg_loader import (
+                load_mimic_ecg_dataset,
+                get_train_val_test_split as mimic_split,
+                SUPERCLASSES,
+            )
+            X, y, _sids = load_mimic_ecg_dataset(max_records=200)
+            splits = mimic_split(X, y)
+        except (FileNotFoundError, RuntimeError) as exc:
+            print(f"  [WARN] MIMIC-IV-ECG not available ({exc}), falling back to synthetic")
+            source = "synthetic"
+            from data.ptbxl_loader import (
+                generate_synthetic_ecg_data,
+                get_train_val_test_split,
+                SUPERCLASSES,
+            )
+            X, y, folds = generate_synthetic_ecg_data(num_samples=100)
+            splits = get_train_val_test_split(X, y, folds)
+    elif source == "ptbxl":
+        from data.ptbxl_loader import (
+            load_ptbxl_from_huggingface,
+            get_train_val_test_split,
+            SUPERCLASSES,
+        )
         X, y, folds = load_ptbxl_from_huggingface()
+        splits = get_train_val_test_split(X, y, folds)
+    else:  # synthetic
+        from data.ptbxl_loader import (
+            generate_synthetic_ecg_data,
+            get_train_val_test_split,
+            SUPERCLASSES,
+        )
+        X, y, folds = generate_synthetic_ecg_data(num_samples=100)
+        splits = get_train_val_test_split(X, y, folds)
 
-    splits = get_train_val_test_split(X, y, folds)
     X_test, y_test = splits["test"]
 
     if len(X_test) == 0:
@@ -129,7 +157,7 @@ def eval_cnn_classifier(use_synthetic: bool = True) -> dict:
     all_labels = np.array(all_labels)
 
     # Compute metrics
-    results = {"per_class": {}, "tests": []}
+    results = {"per_class": {}, "tests": [], "source": source}
 
     try:
         from sklearn.metrics import roc_auc_score
@@ -152,30 +180,52 @@ def eval_cnn_classifier(use_synthetic: bool = True) -> dict:
     return results
 
 
-def eval_full_pipeline(case_data: list[dict] | None = None) -> dict:
-    """Evaluate the full cardiology agent pipeline (requires Ollama)."""
+def eval_full_pipeline(case_data: list[dict] | None = None, source: str = "mimic") -> dict:
+    """Evaluate the full cardiology agent pipeline (requires Ollama).
+
+    Args:
+        case_data: Optional pre-built case dicts. If None, loads from source.
+        source: Data source - 'mimic' or 'synthetic'.
+    """
     from schemas.fhir_input import PatientCase
     from agents.specialists.cardiology.agent import CardiologyAgent
 
-    print("\n── Full Pipeline Evaluation ──")
+    print(f"\n-- Full Pipeline Evaluation (source: {source}) --")
 
     if case_data is None:
-        # Use a default cardiac case
-        case_data = [{
-            "case_id": "EVAL-CARDIO-001",
-            "age": 58,
-            "sex": "M",
-            "chief_complaint": "Chest pain radiating to left arm",
-            "symptoms": ["chest pain", "diaphoresis", "shortness of breath"],
-            "observations": [
-                {"code": "6598-7", "display": "Troponin T", "value": "0.85", "unit": "ng/mL"},
-                {"code": "8867-4", "display": "Heart rate", "value": "110", "unit": "bpm"},
-            ],
-            "notes": ["30-year smoking history. Previous angioplasty in 2019."],
-        }]
+        if source == "mimic":
+            # Try to load MIMIC cardiology cases
+            try:
+                import json
+                mimic_cases_path = Path("data/processed/mimic_cardiology_cases.json")
+                if mimic_cases_path.exists():
+                    with open(mimic_cases_path) as f:
+                        case_data = json.load(f)[:5]  # use first 5 cases
+                    print(f"  Loaded {len(case_data)} MIMIC cardiology cases")
+                else:
+                    print("  [WARN] MIMIC cardiology cases not found, using default case")
+                    source = "synthetic"
+            except Exception as exc:
+                print(f"  [WARN] Failed to load MIMIC cases: {exc}")
+                source = "synthetic"
+
+        if case_data is None:
+            # Default synthetic case
+            case_data = [{
+                "case_id": "EVAL-CARDIO-001",
+                "age": 58,
+                "sex": "M",
+                "chief_complaint": "Chest pain radiating to left arm",
+                "symptoms": ["chest pain", "diaphoresis", "shortness of breath"],
+                "observations": [
+                    {"code": "6598-7", "display": "Troponin T", "value": "0.85", "unit": "ng/mL"},
+                    {"code": "8867-4", "display": "Heart rate", "value": "110", "unit": "bpm"},
+                ],
+                "notes": ["30-year smoking history. Previous angioplasty in 2019."],
+            }]
 
     agent = CardiologyAgent()
-    results = {"cases": []}
+    results = {"cases": [], "source": source}
 
     for cd in case_data:
         case = PatientCase(**cd)
@@ -207,14 +257,15 @@ def eval_full_pipeline(case_data: list[dict] | None = None) -> dict:
 def print_report(dsp_results: dict, cnn_results: dict, pipeline_results: dict | None) -> None:
     """Print formatted evaluation report."""
     print("\n" + "=" * 60)
-    print("  MLTVA — M2 CARDIOLOGY SPECIALIST EVALUATION")
+    print("  MLTVA - M2 CARDIOLOGY SPECIALIST EVALUATION")
+    print(f"  CNN data source: {cnn_results.get('source', 'unknown')}")
     print("=" * 60)
 
     # DSP Results
     print("\n  DSP FEATURE EXTRACTION")
     print("  " + "-" * 40)
     for test in dsp_results["tests"]:
-        status = "✓" if test["passed"] else "✗"
+        status = "PASS" if test["passed"] else "FAIL"
         print(f"  [{status}] {test['test']}")
         if not test["passed"]:
             print(f"      Expected: {test['expected']}, Got: {test['got']}")
@@ -234,7 +285,7 @@ def print_report(dsp_results: dict, cnn_results: dict, pipeline_results: dict | 
 
     # Pipeline Results
     if pipeline_results and "cases" in pipeline_results:
-        print("\n  FULL PIPELINE")
+        print(f"\n  FULL PIPELINE (source: {pipeline_results.get('source', 'unknown')})")
         print("  " + "-" * 40)
         for case in pipeline_results["cases"]:
             print(f"  Case {case['case_id']}: {case.get('status', 'UNKNOWN')}")
@@ -249,15 +300,21 @@ def print_report(dsp_results: dict, cnn_results: dict, pipeline_results: dict | 
 def main():
     parser = argparse.ArgumentParser(description="M2 Cardiology evaluation")
     parser.add_argument("--full", action="store_true", help="Include full pipeline eval (requires Ollama)")
+    parser.add_argument(
+        "--source",
+        choices=["mimic", "ptbxl", "synthetic"],
+        default="mimic",
+        help="Data source: mimic (default), ptbxl, or synthetic",
+    )
     args = parser.parse_args()
 
     dsp_results = eval_dsp_pipeline()
-    cnn_results = eval_cnn_classifier()
+    cnn_results = eval_cnn_classifier(source=args.source)
 
     pipeline_results = None
     if args.full:
         try:
-            pipeline_results = eval_full_pipeline()
+            pipeline_results = eval_full_pipeline(source=args.source)
         except Exception as exc:
             print(f"\n  [WARN] Full pipeline eval failed: {exc}")
 
@@ -266,3 +323,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

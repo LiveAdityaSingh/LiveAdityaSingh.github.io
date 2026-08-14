@@ -7,7 +7,9 @@ Runs the grounding checker against a labeled test set and reports:
   - Per-case breakdown
 
 Usage:
-    python -m evals.m1_grounding_eval
+    python -m evals.m1_grounding_eval                  # default: MIMIC data
+    python -m evals.m1_grounding_eval --source mimic    # MIMIC-IV sourced cases
+    python -m evals.m1_grounding_eval --source synthetic # HuggingFace synthetic cases
 
 This script has NO dependency on M2+ and tests the grounding checker
 in isolation using pre-labeled claims (not LLM-generated ones).
@@ -30,27 +32,61 @@ logger = logging.getLogger(__name__)
 # ── Paths ────────────────────────────────────────────────────────────────────
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
-CASES_FILE = DATA_DIR / "sample_cases.json"
-LABELS_FILE = DATA_DIR / "m1_eval_labels.json"
+
+# Data source file mappings
+DATA_SOURCES = {
+    "synthetic": {
+        "cases": DATA_DIR / "sample_cases.json",
+        "labels": DATA_DIR / "m1_eval_labels.json",
+    },
+    "mimic": {
+        "cases": DATA_DIR / "mimic_sample_cases.json",
+        "labels": DATA_DIR / "m1_eval_labels_mimic.json",
+    },
+}
 
 
-def load_cases() -> dict[str, PatientCase]:
+def load_cases(source: str = "mimic") -> dict[str, PatientCase]:
     """Load patient cases keyed by case_id."""
-    with open(CASES_FILE) as f:
+    cases_file = DATA_SOURCES[source]["cases"]
+    if not cases_file.exists():
+        # Fall back to synthetic if MIMIC cases not yet generated
+        if source == "mimic":
+            logger.warning(
+                "MIMIC cases not found at %s, falling back to synthetic",
+                cases_file,
+            )
+            cases_file = DATA_SOURCES["synthetic"]["cases"]
+        else:
+            raise FileNotFoundError(f"Cases file not found: {cases_file}")
+
+    with open(cases_file) as f:
         raw = json.load(f)
     return {c["case_id"]: PatientCase(**c) for c in raw}
 
 
-def load_labels() -> list[dict]:
+def load_labels(source: str = "mimic") -> list[dict]:
     """Load labeled evaluation data."""
-    with open(LABELS_FILE) as f:
+    labels_file = DATA_SOURCES[source]["labels"]
+    if not labels_file.exists():
+        # Fall back to synthetic if MIMIC labels not yet annotated
+        if source == "mimic":
+            logger.warning(
+                "MIMIC labels not found at %s, falling back to synthetic",
+                labels_file,
+            )
+            labels_file = DATA_SOURCES["synthetic"]["labels"]
+        else:
+            raise FileNotFoundError(f"Labels file not found: {labels_file}")
+
+    with open(labels_file) as f:
         return json.load(f)
 
 
-def run_eval() -> dict:
+def run_eval(source: str = "mimic") -> dict:
     """Run the grounding evaluation and return metrics."""
-    cases = load_cases()
-    label_groups = load_labels()
+    cases = load_cases(source)
+    label_groups = load_labels(source)
 
     tp = fp = tn = fn = 0
     results_detail: list[dict] = []
@@ -111,12 +147,13 @@ def run_eval() -> dict:
     return {"metrics": metrics, "details": results_detail}
 
 
-def print_report(results: dict) -> None:
+def print_report(results: dict, source: str = "mimic") -> None:
     """Print a formatted evaluation report to stdout."""
     m = results["metrics"]
 
     print("\n" + "=" * 70)
     print("  MLTVA — M1 GROUNDING CHECKER EVALUATION REPORT")
+    print(f"  Data source: {source.upper()}")
     print("=" * 70)
 
     print(f"\n  Total claims evaluated:  {m['total_claims']}")
@@ -163,8 +200,19 @@ def print_report(results: dict) -> None:
 
 def main():
     """Entry point for the evaluation script."""
-    results = run_eval()
-    print_report(results)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="M1 Grounding Evaluation")
+    parser.add_argument(
+        "--source",
+        choices=["mimic", "synthetic"],
+        default="mimic",
+        help="Data source: mimic (default) or synthetic",
+    )
+    args = parser.parse_args()
+
+    results = run_eval(source=args.source)
+    print_report(results, source=args.source)
 
     # Exit with non-zero code if acceptance criterion not met
     if results["metrics"]["accuracy"] < 0.90:

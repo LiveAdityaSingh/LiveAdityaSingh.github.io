@@ -13,12 +13,16 @@ dependencies = [
     "pytest",
     "python-dotenv",
     "datasets",
+    "pandas>=2.0",
     # M2: Cardiology specialist dependencies
     "torch>=2.0",
     "scipy>=1.11",
     "wfdb>=4.0",
     "scikit-learn>=1.3",
     "numpy>=1.24",
+    # M3: RAG Specialist dependencies
+    "chromadb>=0.4.0",
+    "sentence-transformers>=2.2.0",
 ]
 
 [project.optional-dependencies]
