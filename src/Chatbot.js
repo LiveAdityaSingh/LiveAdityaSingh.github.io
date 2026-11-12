@@ -1,49 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Bot } from 'lucide-react';
 import './Chatbot.css';
+import { PORTFOLIO_CONTEXT } from './chatContext';
 
-const PORTFOLIO_CONTEXT = `
-You are an AI assistant for Aditya Narayan Singh's portfolio.
-Answer questions ONLY based on the following context. If a user asks something not in the context, politely decline and say you don't have that information. Do not invent anything.
+// Chat proxy URL (see proxy/worker.js). The Groq key lives there, not in this bundle.
+const CHAT_ENDPOINT = process.env.REACT_APP_CHAT_ENDPOINT;
+const OFFLINE_MESSAGE = 'Chat is offline right now. Please email adityasingh2897@gmail.com instead.';
 
-Aditya Narayan Singh is a GCP Professional Data Engineer and Azure AI Associate with 2+ years of experience building production-grade AI and data solutions at Accenture. He is based in Birmingham, UK. He is currently pursuing his MSc in Artificial Intelligence & Machine Learning at the University of Birmingham (2025–2026).
+async function requestReply(history) {
+  if (CHAT_ENDPOINT) {
+    const response = await fetch(CHAT_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history })
+    });
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.reply;
+  }
 
-Education:
-- MSc Artificial Intelligence & Machine Learning at University of Birmingham (2025-2026)
-- B.Tech in Computer Science & Engineering at Dr. APJ Abdul Kalam Technical University, India (2018-2022). CGPA: 7.29.
+  // Legacy path: calls Groq straight from the browser, which exposes the key.
+  // Remove once REACT_APP_CHAT_ENDPOINT is set and the key has been rotated.
+  const p1 = ['g', 's', 'k', '_'].join('');
+  const suffix = process.env.REACT_APP_GROQ_API_KEY_SUFFIX;
+  if (!suffix) {
+    throw new Error('Chat is not configured');
+  }
 
-Experience:
-- Data Engineering Analyst at Accenture Solutions Pvt. Ltd., Pune (Oct 2022 - Aug 2025). Architected and deployed end-to-end predictive pipelines using NiFi and GCP, reducing latency by 40%.
-- Project Intern at Robust Results Pvt. Ltd., Kanpur (May 2020 - Jun 2020). Built predictive analytics solutions with 90% accuracy.
-
-Skills:
-- AI/GenAI: Multi-Agent Systems, RAG, LLMs, NLP, Computer Vision
-- ML/DL: TensorFlow, PyTorch, Scikit-Learn
-- Data Eng: PySpark, Apache NiFi, dbt, Kafka, Hadoop
-- Cloud: GCP (Vertex AI, BigQuery), Azure, AWS, Docker, Kubernetes
-
-Projects:
-- Pulse-Doppler Signal Processing: HealthTech AI 2026 winner. Signal processing using CNN and PyQTG.
-- MindGrow App: AI-powered productivity app.
-- UKFin Smart Renewal System: Financial renewal automation.
-- ML & Deep Learning Collections.
-
-Certifications:
-- Google Cloud Professional Data Engineer (Oct 2024)
-- Microsoft Certified: Azure AI Engineer Associate (Dec 2021)
-- AI Certification (IIT Kanpur), DeepLearning.AI, University at Buffalo.
-
-Co-curricular:
-- HealthTech AI 2026 Winner
-- FrontierTechAI Loyalty Program Challenge Winner
-- Dog NGO Volunteer, Drummer.
-
-Contact:
-- Email: adityasingh2897@gmail.com
-- Phone: +44 7357 674282
-- GitHub: LiveAdityaSingh
-- LinkedIn: aditya-singhofficial
-`;
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${p1 + suffix}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [{ role: 'system', content: PORTFOLIO_CONTEXT }, ...history],
+      temperature: 0.3,
+      max_tokens: 300,
+    })
+  });
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
 
 export default function Chatbot({ isOpen, setIsOpen }) {
   const [messages, setMessages] = useState([
@@ -52,14 +56,36 @@ export default function Chatbot({ isOpen, setIsOpen }) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const toggleRef = useRef(null);
+  const wasOpenRef = useRef(false);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Move focus into the dialog on open and back to the toggle on close
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+    } else if (wasOpenRef.current) {
+      toggleRef.current?.focus();
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, setIsOpen]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -70,58 +96,16 @@ export default function Chatbot({ isOpen, setIsOpen }) {
     setInput('');
     setIsTyping(true);
 
-    const p1 = ['g', 's', 'k', '_'].join('');
-    const suffix = process.env.REACT_APP_GROQ_API_KEY_SUFFIX;
-    const apiKey = suffix ? p1 + suffix : null;
-
-    if (!apiKey) {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          { role: 'error', content: "Error: REACT_APP_GROQ_API_KEY_SUFFIX is missing in .env." }
-        ]);
-        setIsTyping(false);
-      }, 1000);
-      return;
-    }
-
     try {
-      // Prepare message history for the API, prepending the system prompt
-      const apiMessages = [
-        { role: 'system', content: PORTFOLIO_CONTEXT },
-        // Map UI roles to API roles
-        ...messages.map(m => ({ role: m.role === 'error' ? 'assistant' : m.role, content: m.content })),
-        userMessage
-      ];
-
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
-          messages: apiMessages,
-          temperature: 0.3,
-          max_tokens: 300,
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const botReply = data.choices[0].message.content;
+      // Error bubbles are UI-only, so they are left out of the history
+      const history = [...messages.filter(m => m.role !== 'error'), userMessage]
+        .map(m => ({ role: m.role, content: m.content }));
+      const botReply = await requestReply(history);
 
       setMessages((prev) => [...prev, { role: 'assistant', content: botReply }]);
     } catch (error) {
       console.error("Chatbot error:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: 'error', content: "Sorry, I'm having trouble connecting right now." }
-      ]);
+      setMessages((prev) => [...prev, { role: 'error', content: OFFLINE_MESSAGE }]);
     } finally {
       setIsTyping(false);
     }
@@ -130,25 +114,25 @@ export default function Chatbot({ isOpen, setIsOpen }) {
   return (
     <div className={`chatbot-wrapper ${isOpen ? 'chatbot-wrapper--open' : ''}`}>
       {isOpen && (
-        <div className="chatbot-window">
+        <div className="chatbot-window" role="dialog" aria-modal="true" aria-label="Chat with Aditya's assistant">
           <div className="chatbot-header">
             <div className="chatbot-header-title">
-              <Bot size={20} />
+              <Bot size={20} strokeWidth={1.5} aria-hidden="true" />
               Aditya's Assistant
             </div>
-            <button className="chatbot-header-close" onClick={() => setIsOpen(false)}>
-              <X size={20} />
+            <button className="chatbot-header-close" onClick={() => setIsOpen(false)} aria-label="Close chat">
+              <X size={20} strokeWidth={1.5} />
             </button>
           </div>
-          
-          <div className="chatbot-messages">
+
+          <div className="chatbot-messages" aria-live="polite">
             {messages.map((msg, idx) => (
               <div key={idx} className={`chatbot-message ${msg.role === 'user' ? 'user' : msg.role === 'error' ? 'error' : 'bot'}`}>
                 {msg.content}
               </div>
             ))}
             {isTyping && (
-              <div className="chatbot-typing">
+              <div className="chatbot-typing" aria-label="Assistant is typing">
                 <div className="chatbot-typing-dot"></div>
                 <div className="chatbot-typing-dot"></div>
                 <div className="chatbot-typing-dot"></div>
@@ -159,23 +143,24 @@ export default function Chatbot({ isOpen, setIsOpen }) {
 
           <form onSubmit={handleSend} className="chatbot-input-form">
             <input
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about Aditya..."
+              aria-label="Your question"
               className="chatbot-input"
-              disabled={isTyping}
             />
-            <button type="submit" className="chatbot-submit-btn" disabled={isTyping || !input.trim()}>
-              <Send size={18} />
+            <button type="submit" className="chatbot-submit-btn" disabled={isTyping || !input.trim()} aria-label="Send message">
+              <Send size={18} strokeWidth={1.5} />
             </button>
           </form>
         </div>
       )}
-      
+
       {!isOpen && (
-        <button className="chatbot-toggle-btn" onClick={() => setIsOpen(true)} aria-label="Open chat">
-          <MessageSquare size={28} />
+        <button ref={toggleRef} className="chatbot-toggle-btn" onClick={() => setIsOpen(true)} aria-label="Open chat">
+          <MessageSquare size={24} strokeWidth={1.5} />
         </button>
       )}
     </div>
