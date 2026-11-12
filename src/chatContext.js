@@ -11,7 +11,7 @@ Education:
 - B.Tech in Computer Science & Engineering at Dr. APJ Abdul Kalam Technical University, India (2018-2022). CGPA: 7.58.
 
 Experience:
-- Data Engineering Analyst at Accenture Solutions Pvt. Ltd., Pune (Oct 2022 - Aug 2025). Architected and deployed end-to-end predictive pipelines using NiFi and GCP, reducing latency by 40%.
+- Data Engineering Analyst at Accenture Solutions Pvt. Ltd., Pune (Oct 2022 - Jul 2025). Architected and deployed end-to-end predictive pipelines using NiFi and GCP, reducing latency by 40%.
 - Project Intern at Robust Results Pvt. Ltd., Kanpur (May 2020 - Jun 2020). Built predictive analytics solutions with 90% accuracy.
 
 Skills:
@@ -28,16 +28,16 @@ Projects:
 
 Certifications:
 - Google Cloud Professional Data Engineer (Oct 2024)
-- Microsoft Certified: Azure AI Engineer Associate (Dec 2021)
+- Microsoft Certified: Azure AI Engineer Associate (Dec 2024)
 - AI Certification (IIT Kanpur), DeepLearning.AI, University at Buffalo.
 
 Co-curricular:
 - HealthTech AI 2026 Winner
-- FrontierTechAI Loyalty Program Challenge Winner
+- FrontierTechX Loyalty Program Challenge Winner
 - Dog NGO Volunteer, Drummer.
 
 Contact:
-- Email: adityasingh2897@gmail.com
+- Email: adityansingh2897@gmail.com
 - Phone: +44 7352 674282
 - GitHub: LiveAdityaSingh
 - LinkedIn: aditya-singhofficial

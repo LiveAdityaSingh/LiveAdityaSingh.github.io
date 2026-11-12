@@ -4,7 +4,7 @@ import './Chatbot.css';
 
 // Chat proxy URL (see proxy/worker.js). The Groq key and system prompt live there.
 const CHAT_ENDPOINT = process.env.REACT_APP_CHAT_ENDPOINT;
-const OFFLINE_MESSAGE = 'Chat is offline right now. Please email adityasingh2897@gmail.com instead.';
+const OFFLINE_MESSAGE = 'Chat is offline right now. Please email adityansingh2897@gmail.com instead.';
 
 async function requestReply(history) {
   if (!CHAT_ENDPOINT) {

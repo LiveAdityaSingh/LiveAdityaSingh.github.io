@@ -68,8 +68,8 @@ const SECTION_IDS = ['about', 'experience', 'projects', 'skills', 'education', '
 const ABOUT_FACTS = [
   { label: 'Location', value: 'Birmingham, UK' },
   { label: 'Studying', value: 'MSc Artificial Intelligence & Machine Learning, University of Birmingham (2025–2026)' },
-  { label: 'Previously', value: 'Data Engineering Analyst at Accenture (Oct 2022 – Aug 2025)' },
-  { label: 'Awards', value: 'Winner of HealthTech AI 2026 and the FrontierTechAI Loyalty Program Challenge' },
+  { label: 'Previously', value: 'Data Engineering Analyst at Accenture (Oct 2022 – Jul 2025)' },
+  { label: 'Awards', value: 'Winner of HealthTech AI 2026 and the FrontierTechX Loyalty Program Challenge' },
   { label: 'Outside work', value: 'Drummer, volunteer dog carer and badminton enthusiast' },
 ];
 
@@ -117,23 +117,23 @@ const PROJECTS = [
   },
   {
     name: 'Data Analysis Results',
-    desc: 'Exploratory data analysis and statistical modelling projects, including the winning FrontierTechAI Loyalty Program Challenge solution: a marginalized token-based reward ecosystem.',
+    desc: 'Exploratory data analysis and statistical modelling projects, including the winning FrontierTechX Loyalty Program Challenge solution: a marginalized token-based reward ecosystem.',
     tags: ['Python', 'Pandas', 'NumPy', 'Visualization'],
     link: 'https://github.com/LiveAdityaSingh/Data-Anlaysis-Results',
   },
 ];
 
 const CERTS = [
+  { name: 'Microsoft Certified: Azure AI Engineer Associate', org: 'Microsoft', year: 'Dec 2024' },
   { name: 'Google Cloud Professional Data Engineer', org: 'Google Cloud', year: 'Oct 2024' },
-  { name: 'Artificial Intelligence Certification', org: 'ERACT Academy, IIT Kanpur', year: 'Jul 2022' },
-  { name: 'Microsoft Certified: Azure AI Engineer Associate', org: 'Microsoft', year: 'Dec 2021' },
-  { name: 'Neural Networks and Deep Learning', org: 'DeepLearning.AI', year: 'Aug 2021' },
+  { name: 'Neural Networks and Deep Learning', org: 'DeepLearning.AI', year: 'Aug 2022' },
+  { name: 'Artificial Intelligence Certification', org: 'E&ICT Academy, IIT Kanpur', year: 'Jul 2022' },
   { name: 'Computer Vision Basics', org: 'University at Buffalo', year: 'Jan 2021' },
 ];
 
 const BEYOND_WORK = [
   { title: 'HealthTech AI 2026', award: 'Winner', desc: 'Won the HealthTech AI 2026 competition with an optimized solution for doppler signal processing and denoising using a CNN, frame slicing, a sliding window algorithm and PyQTG. The project is live on GitHub.' },
-  { title: 'FrontierTechAI Loyalty Program Challenge', award: 'Winner', desc: 'Built a marginalized token-based reward ecosystem and mobile app using Python, JSON, stable coin integration and banking APIs.' },
+  { title: 'FrontierTechX Loyalty Program Challenge', award: 'Winner', desc: 'Built a marginalized token-based reward ecosystem and mobile app using Python, JSON, stable coin integration and banking APIs.' },
   { title: 'Dog NGO volunteer', desc: 'Co-ordinated volunteers with a dog NGO to rescue, feed and vaccinate dogs in the assigned region, which took teamwork, compassion and leadership.' },
   { title: 'Drummer and music enthusiast', desc: 'Passionate about rhythm and precision. Learning the drums and exploring where creative arts meet technology, with the same discipline I bring to engineering.' },
 ];
@@ -306,7 +306,7 @@ function Experience() {
   return (
     <Section id="experience" title="Experience">
       <div className="timeline">
-        <TimelineItem role="Data Engineering Analyst" place="Accenture Solutions Pvt. Ltd., Pune, India" period="Oct 2022 – Aug 2025">
+        <TimelineItem role="Data Engineering Analyst" place="Accenture Solutions Pvt. Ltd., Pune, India" period="Oct 2022 – Jul 2025">
           <ul>
             <li><strong>40% lower architecture latency:</strong> architected and deployed end-to-end predictive pipelines using NiFi and GCP, accelerating data-driven decision-making.</li>
             <li><strong>300M+ records:</strong> engineered and optimised the ETL architecture, cutting data-to-model latency by 30% to enable real-time predictive analytics.</li>
@@ -447,7 +447,7 @@ function Contact() {
     e.preventDefault();
     const subject = encodeURIComponent(`Portfolio Contact from ${formData.name}`);
     const body = encodeURIComponent(`Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`);
-    window.location.href = `mailto:adityasingh2897@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:adityansingh2897@gmail.com?subject=${subject}&body=${body}`;
     setSent(true);
     setTimeout(() => setSent(false), 4000);
   };
@@ -525,11 +525,11 @@ function Contact() {
             </div>
           </a>
 
-          <a href="mailto:adityasingh2897@gmail.com" className="contact-card" id="contact-email">
+          <a href="mailto:adityansingh2897@gmail.com" className="contact-card" id="contact-email">
             <Mail size={20} strokeWidth={1.5} aria-hidden="true" />
             <div>
               <div className="contact-label">Email</div>
-              <div className="contact-value">adityasingh2897@gmail.com</div>
+              <div className="contact-value">adityansingh2897@gmail.com</div>
             </div>
           </a>
 
