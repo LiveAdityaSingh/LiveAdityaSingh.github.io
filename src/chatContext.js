@@ -38,7 +38,7 @@ Co-curricular:
 
 Contact:
 - Email: adityasingh2897@gmail.com
-- Phone: +44 7357 674282
+- Phone: +44 7352 674282
 - GitHub: LiveAdityaSingh
 - LinkedIn: aditya-singhofficial
 `;

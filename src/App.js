@@ -532,11 +532,11 @@ function Contact() {
             </div>
           </a>
 
-          <a href="tel:+447357674282" className="contact-card" id="contact-phone">
+          <a href="tel:+447352674282" className="contact-card" id="contact-phone">
             <Phone size={20} strokeWidth={1.5} aria-hidden="true" />
             <div>
               <div className="contact-label">Phone</div>
-              <div className="contact-value">+44 7357 674282</div>
+              <div className="contact-value">+44 7352 674282</div>
             </div>
           </a>
         </div>
