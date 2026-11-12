@@ -214,10 +214,10 @@ function Hero() {
       <motion.div className="hero-grid" initial="hidden" animate="visible">
         <motion.div className="hero-photo" variants={fadeUp} custom={0.12}>
           <img
-            src={process.env.PUBLIC_URL + '/profile.jpg'}
+            src={process.env.PUBLIC_URL + '/avatar_transparent.png'}
             alt="Aditya Narayan Singh"
-            width="417"
-            height="487"
+            width="500"
+            height="440"
           />
         </motion.div>
 

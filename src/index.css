@@ -356,14 +356,14 @@ main:focus {
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid var(--border-hover);
-  background: var(--bg-body);
+  background: var(--surface-hover);
 }
 
 .hero-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 20%;
+  object-position: 50% 40%;
 }
 
 .hero-content {
