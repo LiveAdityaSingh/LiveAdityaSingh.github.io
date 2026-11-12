@@ -248,15 +248,10 @@ function Hero() {
                 View projects <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
               </a>
               <a href="#contact" className="btn-outline" id="hero-contact-btn">Get in touch</a>
+              <a href={CV_URL} className="btn-outline btn-cv" id="hero-cv-link" download>
+                <FileDown size={16} strokeWidth={1.5} aria-hidden="true" /> Download CV
+              </a>
             </div>
-
-            <p className="hero-proof">
-              <span>Winner, HealthTech AI 2026.</span> 40% latency reduction at Accenture.
-            </p>
-
-            <a href={CV_URL} className="hero-cv" id="hero-cv-link" download>
-              <FileDown size={16} strokeWidth={1.5} aria-hidden="true" /> Download CV (PDF)
-            </a>
           </motion.div>
         </div>
       </motion.div>

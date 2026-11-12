@@ -426,29 +426,6 @@ main:focus {
   gap: 0.875rem;
 }
 
-.hero-proof {
-  margin-top: 2rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.hero-proof span {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.hero-cv {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  transition: color 150ms var(--ease-out);
-}
-
 /* Buttons */
 .btn-primary,
 .btn-outline,
@@ -481,6 +458,15 @@ main:focus {
   background: var(--bg-deep);
   color: var(--text-primary);
   border: 1px solid var(--border-hover);
+}
+
+/* CV download: outlined in amber so it stands out from the plain outline button */
+.btn-cv {
+  border-color: rgba(245, 158, 11, 0.55);
+}
+
+.btn-cv svg {
+  color: var(--accent);
 }
 
 .btn-primary:active,
@@ -1012,6 +998,10 @@ main:focus {
     border-color: rgba(255, 255, 255, 0.28);
   }
 
+  .btn-cv:hover {
+    border-color: var(--accent);
+  }
+
   .project-card:hover,
   .contact-card:hover {
     transform: translateY(-2px);
@@ -1020,7 +1010,6 @@ main:focus {
   }
 
   .project-link:hover,
-  .hero-cv:hover,
   .footer a:hover {
     color: var(--accent);
   }
