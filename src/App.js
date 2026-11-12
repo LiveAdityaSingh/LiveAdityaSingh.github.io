@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
-import { Menu, X, ArrowRight, ArrowUpRight, Github, Linkedin, Mail, Phone } from 'lucide-react';
+import { Menu, X, ArrowRight, ArrowUpRight, Github, Linkedin, Mail, Phone, FileDown } from 'lucide-react';
 import './index.css';
 import Chatbot from './Chatbot';
 
@@ -52,6 +52,8 @@ function Section({ id, title, children }) {
 /* ═══════════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════════ */
+
+const CV_URL = process.env.PUBLIC_URL + '/Aditya-Narayan-Singh-CV.pdf';
 
 const NAV_LINKS = [
   { href: '#about', label: 'About' },
@@ -251,6 +253,10 @@ function Hero() {
             <p className="hero-proof">
               <span>Winner, HealthTech AI 2026.</span> 40% latency reduction at Accenture.
             </p>
+
+            <a href={CV_URL} className="hero-cv" id="hero-cv-link" download>
+              <FileDown size={16} strokeWidth={1.5} aria-hidden="true" /> Download CV (PDF)
+            </a>
           </motion.div>
         </div>
       </motion.div>
@@ -529,6 +535,14 @@ function Contact() {
             <div>
               <div className="contact-label">Email</div>
               <div className="contact-value">adityasingh2897@gmail.com</div>
+            </div>
+          </a>
+
+          <a href={CV_URL} className="contact-card" id="contact-cv" download>
+            <FileDown size={20} strokeWidth={1.5} aria-hidden="true" />
+            <div>
+              <div className="contact-label">CV</div>
+              <div className="contact-value">Download PDF</div>
             </div>
           </a>
 

@@ -437,6 +437,18 @@ main:focus {
   font-weight: 600;
 }
 
+.hero-cv {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color 150ms var(--ease-out);
+}
+
 /* Buttons */
 .btn-primary,
 .btn-outline,
@@ -1008,6 +1020,7 @@ main:focus {
   }
 
   .project-link:hover,
+  .hero-cv:hover,
   .footer a:hover {
     color: var(--accent);
   }
