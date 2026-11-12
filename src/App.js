@@ -67,7 +67,7 @@ const SECTION_IDS = ['about', 'experience', 'projects', 'skills', 'education', '
 
 const ABOUT_FACTS = [
   { label: 'Location', value: 'Birmingham, UK' },
-  { label: 'Studying', value: 'MSc Artificial Intelligence & Machine Learning, University of Birmingham (2025–2026)' },
+  { label: 'Education', value: 'MSc Artificial Intelligence & Machine Learning, University of Birmingham (2025–2026), completed' },
   { label: 'Previously', value: 'Data Engineering Analyst at Accenture (Oct 2022 – Jul 2025)' },
   { label: 'Awards', value: 'Winner of HealthTech AI 2026 and the FrontierTechX Loyalty Program Challenge' },
   { label: 'Outside work', value: 'Drummer, volunteer dog carer and badminton enthusiast' },
@@ -239,8 +239,8 @@ function Hero() {
 
             <p className="hero-desc">
               At Accenture I cut architecture latency by 40% and, on a 300M+ record ETL, data-to-model latency by 30%.
-              In 2026 I won <strong>HealthTech AI</strong> (1st of 7 teams) with a Doppler signal-denoising model.
-              Now I'm finishing an <strong>MSc in AI &amp; Machine Learning</strong> at the University of Birmingham.
+              In 2026 I won <strong>HealthTech AI</strong> (1st of 7 teams) with a Doppler signal-denoising model
+              and completed an <strong>MSc in AI &amp; Machine Learning</strong> at the University of Birmingham.
             </p>
 
             <div className="hero-ctas">
@@ -265,13 +265,13 @@ function About() {
     <Section id="about" title="About">
       <div className="about-body">
         <p>
-          I build AI and data systems that run in production. I'm a <strong>GCP Professional Data Engineer</strong> and <strong>Azure AI Engineer Associate</strong>, and I'm finishing an MSc in AI &amp; Machine Learning at the University of Birmingham.
+          I build AI and data systems that run in production. I'm a <strong>GCP Professional Data Engineer</strong> and <strong>Azure AI Engineer Associate</strong>, with an MSc in AI &amp; Machine Learning from the University of Birmingham.
         </p>
         <p>
-          For three years at Accenture I was a data engineering analyst. My NiFi and GCP pipelines cut architecture latency by 40%. My ETL work on 300M+ records cut data-to-model latency by 30%. I also introduced enterprise-level RAG and multi-agent frameworks, working in Python and Google Cloud (Vertex AI, BigQuery, Dataproc).
+          I've always loved AI development. For three years at Accenture I was a data engineering analyst, and it taught me a lot. My NiFi and GCP pipelines cut architecture latency by 40%. My ETL work on 300M+ records cut data-to-model latency by 30%. I also introduced enterprise-level RAG and multi-agent frameworks, working in Python and Google Cloud (Vertex AI, BigQuery, Dataproc).
         </p>
         <p>
-          Now I'm going deeper on the research side: computer vision, deep learning and evolutionary computation. My research interest is a multi-modal, multi-agent architecture for clinical report generation, with a credibility score so the output can be trusted.
+          With those skills in hand, I went back to study AI in depth. My MSc covered computer vision, deep learning and evolutionary computation. My research interest is a multi-modal, multi-agent architecture for clinical report generation, with a credibility score so the output can be trusted.
         </p>
       </div>
       <dl className="about-facts">
@@ -370,7 +370,7 @@ function Education() {
   return (
     <Section id="education" title="Education and certifications">
       <div className="timeline">
-        <TimelineItem role="MSc Artificial Intelligence &amp; Machine Learning" place="University of Birmingham, Edgbaston, UK" period="Sep 2025 – Sep 2026" current>
+        <TimelineItem role="MSc Artificial Intelligence &amp; Machine Learning" place="University of Birmingham, Edgbaston, UK" period="Sep 2025 – Sep 2026">
           <p>Postgraduate programme in AI/ML with a focus on deep learning, computer vision, and evolutionary computation.</p>
           <ul>
             <li>Key Modules: Mathematics for AI, Artificial Intelligence, Computer Vision &amp; Images, NLP.</li>
@@ -455,8 +455,8 @@ function Contact() {
   return (
     <Section id="contact" title="Contact">
       <p className="section-intro">
+        I've completed my MSc and I'm actively looking for AI Engineer roles.
         Open to graduate roles, research collaborations, and interesting conversations.
-        I'm actively seeking opportunities as I complete my MSc.
       </p>
 
       <div className="roles" id="roles">
