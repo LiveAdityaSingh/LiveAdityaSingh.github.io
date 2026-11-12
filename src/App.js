@@ -86,8 +86,8 @@ const PROJECTS = [
   {
     name: 'Pulse-Doppler Signal Processing',
     award: 'Winner, HealthTech AI 2026',
-    desc: 'An optimized solution for doppler signal processing and denoising, built with a CNN, frame slicing, a sliding window algorithm and PyQTG.',
-    tags: ['Python', 'CNN', 'PyQTG', 'Signal Processing'],
+    desc: 'A Doppler signal-processing pipeline that removes about 80% of the noise and reaches 90% model accuracy. Built with a CNN, frame slicing, a sliding window algorithm, a FastAPI backend and PyQTG.',
+    tags: ['Python', 'CNN', 'FastAPI', 'PyQTG', 'Signal Processing'],
     link: 'https://github.com/LiveAdityaSingh/Pulse-Doppler-Signal-Processing',
     featured: true,
   },
@@ -132,8 +132,8 @@ const CERTS = [
 ];
 
 const BEYOND_WORK = [
-  { title: 'HealthTech AI 2026', award: 'Winner', desc: 'Won the HealthTech AI 2026 competition with an optimized solution for doppler signal processing and denoising using a CNN, frame slicing, a sliding window algorithm and PyQTG. The project is live on GitHub.' },
-  { title: 'FrontierTechX Loyalty Program Challenge', award: 'Winner', desc: 'Built a marginalized token-based reward ecosystem and mobile app using Python, JSON, stable coin integration and banking APIs.' },
+  { title: 'HealthTech AI 2026', award: 'Winner', desc: 'First place out of 7 teams. Our Doppler signal-processing pipeline removes about 80% of the noise at 90% model accuracy. The project is live on GitHub.' },
+  { title: 'FrontierTechX Loyalty Program Challenge', award: 'Winner', desc: 'First place out of 11 teams. Built a token-based reward ecosystem and mobile app to grow MSME transactions, using Python, JSON, stable coin integration and banking APIs.' },
   { title: 'Dog NGO volunteer', desc: 'Co-ordinated volunteers with a dog NGO to rescue, feed and vaccinate dogs in the assigned region, which took teamwork, compassion and leadership.' },
   { title: 'Drummer and music enthusiast', desc: 'Passionate about rhythm and precision. Learning the drums and exploring where creative arts meet technology, with the same discipline I bring to engineering.' },
 ];
@@ -238,9 +238,9 @@ function Hero() {
             </p>
 
             <p className="hero-desc">
-              3 years building production-grade AI and data solutions. Expert in architecting scalable
-              pipelines and agentic AI systems using Python and Google Cloud (Vertex AI, BigQuery, Dataproc).
-              Currently pursuing <strong>MSc AI &amp; Machine Learning</strong> at the University of Birmingham.
+              At Accenture I cut architecture latency by 40% and, on a 300M+ record ETL, data-to-model latency by 30%.
+              In 2026 I won <strong>HealthTech AI</strong> (1st of 7 teams) with a Doppler signal-denoising model.
+              Now I'm finishing an <strong>MSc in AI &amp; Machine Learning</strong> at the University of Birmingham.
             </p>
 
             <div className="hero-ctas">
@@ -265,13 +265,13 @@ function About() {
     <Section id="about" title="About">
       <div className="about-body">
         <p>
-          Hi, I'm <strong>Aditya Narayan Singh</strong>, a GCP Professional Data Engineer and Azure AI Associate with 3 years of experience building production-grade AI and data solutions at Accenture. I'm based in <strong>Birmingham, UK</strong>.
+          I build AI and data systems that run in production. I'm a <strong>GCP Professional Data Engineer</strong> and <strong>Azure AI Engineer Associate</strong>, and I'm finishing an MSc in AI &amp; Machine Learning at the University of Birmingham.
         </p>
         <p>
-          I have extensive experience designing scalable pipelines and agentic AI systems in Python and Google Cloud (Vertex AI, BigQuery, Dataproc). I cut system latency by 40% and introduced enterprise-level RAG and multi-agent frameworks.
+          For three years at Accenture I was a data engineering analyst. My NiFi and GCP pipelines cut architecture latency by 40%. My ETL work on 300M+ records cut data-to-model latency by 30%. I also introduced enterprise-level RAG and multi-agent frameworks, working in Python and Google Cloud (Vertex AI, BigQuery, Dataproc).
         </p>
         <p>
-          I'm studying <strong>MSc Artificial Intelligence &amp; Machine Learning</strong> at the University of Birmingham, with research interests in computer vision, deep learning and evolutionary computation.
+          Now I'm going deeper on the research side: computer vision, deep learning and evolutionary computation. My research interest is a multi-modal, multi-agent architecture for clinical report generation, with a credibility score so the output can be trusted.
         </p>
       </div>
       <dl className="about-facts">
