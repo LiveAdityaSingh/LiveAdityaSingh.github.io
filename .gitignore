@@ -1,35 +1,23 @@
-﻿# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.pdb
-*.sqlite3
-*.sqlite
-*.db
-.venv/
-venv/
-env/
-# Build
-build/
-dist/
-*.egg-info/
-pip-wheel-metadata/
-# OS and editors
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
 .DS_Store
-Thumbs.db
-.vscode/
-*.code-workspace
-# Logs
-*.log
-# Docs and plans
-*.md
-docs/
-AGENTS.md
-MLTVA_Technical_Build_Spec.md
-# Binary installers
-*.exe
-# Data raw files
-data/raw/
-# Jupyter
-.ipynb_checkpoints/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
