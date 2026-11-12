@@ -11,7 +11,7 @@ import { PORTFOLIO_CONTEXT } from '../src/chatContext.js';
 const ALLOWED_ORIGINS = ['https://liveadityasingh.github.io', 'http://localhost:3000'];
 const MAX_MESSAGES = 12;
 const MAX_MESSAGE_CHARS = 1000;
-const MAX_TOKENS = 300;
+const MAX_TOKENS = 500;
 
 // Per-IP rate limit. Held in memory per worker instance, so it is best-effort.
 const RATE_WINDOW_MS = 60 * 1000;
@@ -82,14 +82,16 @@ export default {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
+        model: 'openai/gpt-oss-20b',
         messages: [{ role: 'system', content: PORTFOLIO_CONTEXT }, ...history],
         temperature: 0.3,
+        // gpt-oss is a reasoning model: keep reasoning short so it fits the token cap
+        reasoning_effort: 'low',
         max_tokens: MAX_TOKENS,
       }),
     });
     if (!response.ok) {
-      return json({ error: 'Upstream error' }, 502, cors);
+      return json({ error: 'Upstream error', upstreamStatus: response.status }, 502, cors);
     }
 
     const data = await response.json();

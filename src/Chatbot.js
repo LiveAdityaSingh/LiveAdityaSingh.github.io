@@ -1,52 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, X, Send, Bot } from 'lucide-react';
 import './Chatbot.css';
-import { PORTFOLIO_CONTEXT } from './chatContext';
 
-// Chat proxy URL (see proxy/worker.js). The Groq key lives there, not in this bundle.
+// Chat proxy URL (see proxy/worker.js). The Groq key and system prompt live there.
 const CHAT_ENDPOINT = process.env.REACT_APP_CHAT_ENDPOINT;
 const OFFLINE_MESSAGE = 'Chat is offline right now. Please email adityasingh2897@gmail.com instead.';
 
 async function requestReply(history) {
-  if (CHAT_ENDPOINT) {
-    const response = await fetch(CHAT_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: history })
-    });
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.reply;
+  if (!CHAT_ENDPOINT) {
+    throw new Error('REACT_APP_CHAT_ENDPOINT is not set');
   }
-
-  // Legacy path: calls Groq straight from the browser, which exposes the key.
-  // Remove once REACT_APP_CHAT_ENDPOINT is set and the key has been rotated.
-  const p1 = ['g', 's', 'k', '_'].join('');
-  const suffix = process.env.REACT_APP_GROQ_API_KEY_SUFFIX;
-  if (!suffix) {
-    throw new Error('Chat is not configured');
-  }
-
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch(CHAT_ENDPOINT, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${p1 + suffix}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
-      messages: [{ role: 'system', content: PORTFOLIO_CONTEXT }, ...history],
-      temperature: 0.3,
-      max_tokens: 300,
-    })
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages: history })
   });
   if (!response.ok) {
     throw new Error(`API Error: ${response.status}`);
   }
   const data = await response.json();
-  return data.choices[0].message.content;
+  return data.reply;
 }
 
 export default function Chatbot({ isOpen, setIsOpen }) {
